@@ -6,8 +6,8 @@ use Illuminate\View\View;
 use Laminas\Diactoros\Response\HtmlResponse;
 use League\Route\Route;
 use League\Route\Strategy\ApplicationStrategy;
-use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
 
 class Strategy extends ApplicationStrategy
 {
