@@ -2,11 +2,11 @@
 
 namespace Mini\Framework\Routing;
 
-use InvalidArgumentException;
 use Illuminate\Container\Container;
+use InvalidArgumentException;
+use League\Route\Middleware\MiddlewareAwareTrait as LeagueMiddlewareAwareTrait;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Server\MiddlewareInterface;
-use League\Route\Middleware\MiddlewareAwareTrait as LeagueMiddlewareAwareTrait;
 
 trait MiddlewareAwareTrait
 {

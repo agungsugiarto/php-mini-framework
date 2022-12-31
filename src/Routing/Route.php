@@ -3,9 +3,8 @@
 namespace Mini\Framework\Routing;
 
 use Illuminate\Container\Container;
-use Psr\Container\ContainerInterface;
 use League\Route\Route as LeagueRoute;
-use Mini\Framework\Routing\MiddlewareAwareTrait;
+use Psr\Container\ContainerInterface;
 
 class Route extends LeagueRoute
 {
@@ -19,11 +18,11 @@ class Route extends LeagueRoute
         if ($container instanceof Container) {
             return $container->make($class);
         }
-    
+
         if (class_exists($class)) {
             return new $class();
         }
-    
+
         return $class;
     }
 }
