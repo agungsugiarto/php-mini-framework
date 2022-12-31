@@ -1,6 +1,6 @@
 <?php
 
-namespace Laravel\Lumen\Bus;
+namespace Mini\Framework\Bus;
 
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Bus\Dispatcher;

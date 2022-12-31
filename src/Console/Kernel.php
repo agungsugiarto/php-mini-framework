@@ -1,6 +1,6 @@
 <?php
 
-namespace Laravel\Lumen\Console;
+namespace Mini\Framework\Console;
 
 use Illuminate\Console\Application as Artisan;
 use Illuminate\Console\Scheduling\Schedule;
@@ -8,8 +8,8 @@ use Illuminate\Console\Scheduling\ScheduleRunCommand;
 use Illuminate\Contracts\Console\Kernel as KernelContract;
 use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Http\Request;
-use Laravel\Lumen\Application;
-use Laravel\Lumen\Exceptions\Handler;
+use Mini\Framework\Application;
+use Mini\Framework\Exceptions\Handler;
 use RuntimeException;
 use Throwable;
 
@@ -18,7 +18,7 @@ class Kernel implements KernelContract
     /**
      * The application implementation.
      *
-     * @var \Laravel\Lumen\Application
+     * @var \Mini\Framework\Application
      */
     protected $app;
 
@@ -46,7 +46,7 @@ class Kernel implements KernelContract
     /**
      * Create a new console kernel instance.
      *
-     * @param  \Laravel\Lumen\Application  $app
+     * @param  \Mini\Framework\Application  $app
      * @return void
      */
     public function __construct(Application $app)

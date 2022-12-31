@@ -3,8 +3,7 @@ name: tests
 on:
   push:
     branches:
-      - master
-      - '*.x'
+      - php-mini-framework
   pull_request:
   schedule:
     - cron: '0 0 * * *'

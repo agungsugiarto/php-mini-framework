@@ -1,17 +1,17 @@
 <?php
 
-namespace Laravel\Lumen\Concerns;
+namespace Mini\Framework\Concerns;
 
-use ErrorException;
 use Exception;
-use Illuminate\Contracts\Debug\ExceptionHandler;
+use Throwable;
+use ErrorException;
 use Illuminate\Log\LogManager;
-use Laravel\Lumen\Exceptions\Handler;
+use Mini\Framework\Exceptions\Handler;
+use Illuminate\Contracts\Debug\ExceptionHandler;
+use League\Route\Http\Exception as HttpException;
+use League\Route\Http\Exception\NotFoundException;
 use Symfony\Component\Console\Output\ConsoleOutput;
 use Symfony\Component\ErrorHandler\Error\FatalError;
-use Symfony\Component\HttpKernel\Exception\HttpException;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
-use Throwable;
 
 trait RegistersExceptionHandlers
 {
@@ -23,15 +23,15 @@ trait RegistersExceptionHandlers
      * @param  array  $headers
      * @return void
      *
-     * @throws \Symfony\Component\HttpKernel\Exception\HttpException
+     * @throws \League\Route\Http\Exception\HttpExceptionInterface
      */
     public function abort($code, $message = '', array $headers = [])
     {
         if ($code == 404) {
-            throw new NotFoundHttpException($message);
+            throw new NotFoundException($message);
         }
 
-        throw new HttpException($code, $message, null, $headers);
+        throw new HttpException($code, $message, null, $headers, $code);
     }
 
     /**
@@ -176,7 +176,7 @@ trait RegistersExceptionHandlers
      * Send the exception to the handler and return the response.
      *
      * @param  \Throwable  $e
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return \Psr\Http\Message\ResponseInterface
      */
     protected function sendExceptionToHandler(Throwable $e)
     {

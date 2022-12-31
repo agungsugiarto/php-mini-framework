@@ -1,6 +1,6 @@
 <?php
 
-namespace Laravel\Lumen\Routing;
+namespace Mini\Framework\Routing;
 
 class Controller
 {

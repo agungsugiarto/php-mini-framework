@@ -1,6 +1,6 @@
 <?php
 
-namespace Laravel\Lumen\Concerns;
+namespace Mini\Framework\Concerns;
 
 use Closure;
 use FastRoute\Dispatcher;
@@ -10,10 +10,10 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
-use Laravel\Lumen\Http\Request as LumenRequest;
-use Laravel\Lumen\Routing\Closure as RoutingClosure;
-use Laravel\Lumen\Routing\Controller as LumenController;
-use Laravel\Lumen\Routing\Pipeline;
+use Mini\Framework\Http\Request as LumenRequest;
+use Mini\Framework\Routing\Closure as RoutingClosure;
+use Mini\Framework\Routing\Controller as LumenController;
+use Mini\Framework\Routing\Pipeline;
 use Psr\Http\Message\ResponseInterface as PsrResponseInterface;
 use RuntimeException;
 use Symfony\Bridge\PsrHttpMessage\Factory\HttpFoundationFactory;

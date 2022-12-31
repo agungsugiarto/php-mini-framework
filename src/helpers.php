@@ -5,7 +5,7 @@ use Illuminate\Contracts\Auth\Factory as AuthFactory;
 use Illuminate\Contracts\Broadcasting\Factory as BroadcastFactory;
 use Illuminate\Contracts\Bus\Dispatcher;
 use Illuminate\Contracts\Debug\ExceptionHandler;
-use Laravel\Lumen\Bus\PendingDispatch;
+use Mini\Framework\Bus\PendingDispatch;
 
 if (! function_exists('abort')) {
     /**
@@ -31,7 +31,7 @@ if (! function_exists('app')) {
      *
      * @param  string|null  $make
      * @param  array  $parameters
-     * @return mixed|\Laravel\Lumen\Application
+     * @return mixed|\Mini\Framework\Application
      */
     function app($make = null, array $parameters = [])
     {
@@ -213,11 +213,11 @@ if (! function_exists('redirect')) {
      * @param  int  $status
      * @param  array  $headers
      * @param  bool|null  $secure
-     * @return \Laravel\Lumen\Http\Redirector|\Illuminate\Http\RedirectResponse
+     * @return \Mini\Framework\Http\Redirector|\Illuminate\Http\RedirectResponse
      */
     function redirect($to = null, $status = 302, $headers = [], $secure = null)
     {
-        $redirector = new Laravel\Lumen\Http\Redirector(app());
+        $redirector = new Mini\Framework\Http\Redirector(app());
 
         if (is_null($to)) {
             return $redirector;
@@ -284,11 +284,11 @@ if (! function_exists('response')) {
      * @param  string  $content
      * @param  int  $status
      * @param  array  $headers
-     * @return \Illuminate\Http\Response|\Laravel\Lumen\Http\ResponseFactory
+     * @return \Illuminate\Http\Response|\Mini\Framework\Http\ResponseFactory
      */
     function response($content = '', $status = 200, array $headers = [])
     {
-        $factory = new Laravel\Lumen\Http\ResponseFactory;
+        $factory = new Mini\Framework\Http\ResponseFactory;
 
         if (func_num_args() === 0) {
             return $factory;

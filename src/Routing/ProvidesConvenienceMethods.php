@@ -1,6 +1,6 @@
 <?php
 
-namespace Laravel\Lumen\Routing;
+namespace Mini\Framework\Routing;
 
 use Closure as BaseClosure;
 use Illuminate\Contracts\Auth\Access\Gate;
