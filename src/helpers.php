@@ -1,10 +1,10 @@
 <?php
 
 use Illuminate\Container\Container;
-use Illuminate\Contracts\Auth\Factory as AuthFactory;
 use Illuminate\Contracts\Broadcasting\Factory as BroadcastFactory;
 use Illuminate\Contracts\Bus\Dispatcher;
 use Illuminate\Contracts\Debug\ExceptionHandler;
+use Laminas\Diactoros\Response\RedirectResponse;
 use Mini\Framework\Bus\PendingDispatch;
 
 if (! function_exists('abort')) {
@@ -16,8 +16,8 @@ if (! function_exists('abort')) {
      *
      * @return void
      *
-     * @throws \Symfony\Component\HttpKernel\Exception\HttpException
-     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
+     * @throws \League\Route\Http\Exception
+     * @throws \League\Route\Http\Exception\NotFoundException
      */
     function abort($code, $message = '', array $headers = [])
     {
@@ -40,24 +40,6 @@ if (! function_exists('app')) {
         }
 
         return Container::getInstance()->make($make, $parameters);
-    }
-}
-
-if (! function_exists('auth')) {
-    /**
-     * Get the available auth instance.
-     *
-     * @param string|null $guard
-     *
-     * @return \Illuminate\Contracts\Auth\Factory|\Illuminate\Contracts\Auth\Guard|\Illuminate\Contracts\Auth\StatefulGuard
-     */
-    function auth($guard = null)
-    {
-        if (is_null($guard)) {
-            return app(AuthFactory::class);
-        }
-
-        return app(AuthFactory::class)->guard($guard);
     }
 }
 
@@ -223,19 +205,12 @@ if (! function_exists('redirect')) {
      * @param string|null $to
      * @param int         $status
      * @param array       $headers
-     * @param bool|null   $secure
      *
-     * @return \Mini\Framework\Http\Redirector|\Illuminate\Http\RedirectResponse
+     * @return RedirectResponse
      */
-    function redirect($to = null, $status = 302, $headers = [], $secure = null)
+    function redirect($to = null, $status = 302, $headers = [])
     {
-        $redirector = new Mini\Framework\Http\Redirector(app());
-
-        if (is_null($to)) {
-            return $redirector;
-        }
-
-        return $redirector->to($to, $status, $headers, $secure);
+        return new RedirectResponse($to, $status, $headers);
     }
 }
 
@@ -253,31 +228,6 @@ if (! function_exists('report')) {
     }
 }
 
-if (! function_exists('request')) {
-    /**
-     * Get an instance of the current request or an input item from the request.
-     *
-     * @param array|string|null $key
-     * @param mixed             $default
-     *
-     * @return \Illuminate\Http\Request|string|array
-     */
-    function request($key = null, $default = null)
-    {
-        if (is_null($key)) {
-            return app('request');
-        }
-
-        if (is_array($key)) {
-            return app('request')->only($key);
-        }
-
-        $value = app('request')->__get($key);
-
-        return is_null($value) ? value($default) : $value;
-    }
-}
-
 if (! function_exists('resource_path')) {
     /**
      * Get the path to the resources folder.
@@ -289,43 +239,6 @@ if (! function_exists('resource_path')) {
     function resource_path($path = '')
     {
         return app()->resourcePath($path);
-    }
-}
-
-if (! function_exists('response')) {
-    /**
-     * Return a new response from the application.
-     *
-     * @param string $content
-     * @param int    $status
-     *
-     * @return \Illuminate\Http\Response|\Mini\Framework\Http\ResponseFactory
-     */
-    function response($content = '', $status = 200, array $headers = [])
-    {
-        $factory = new Mini\Framework\Http\ResponseFactory;
-
-        if (func_num_args() === 0) {
-            return $factory;
-        }
-
-        return $factory->make($content, $status, $headers);
-    }
-}
-
-if (! function_exists('route')) {
-    /**
-     * Generate a URL to a named route.
-     *
-     * @param string    $name
-     * @param array     $parameters
-     * @param bool|null $secure
-     *
-     * @return string
-     */
-    function route($name, $parameters = [], $secure = null)
-    {
-        return app('url')->route($name, $parameters, $secure);
     }
 }
 
@@ -392,22 +305,6 @@ if (! function_exists('trans_choice')) {
     function trans_choice($id, $number, array $replace = [], $locale = null)
     {
         return app('translator')->choice($id, $number, $replace, $locale);
-    }
-}
-
-if (! function_exists('url')) {
-    /**
-     * Generate a url for the application.
-     *
-     * @param string    $path
-     * @param mixed     $parameters
-     * @param bool|null $secure
-     *
-     * @return string
-     */
-    function url($path = null, $parameters = [], $secure = null)
-    {
-        return app('url')->to($path, $parameters, $secure);
     }
 }
 
