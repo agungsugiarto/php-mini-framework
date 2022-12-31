@@ -16,9 +16,9 @@ class ResponseFactory
     /**
      * Return a new response from the application.
      *
-     * @param  string  $content
-     * @param  int  $status
-     * @param  array  $headers
+     * @param string $content
+     * @param int    $status
+     *
      * @return \Illuminate\Http\Response
      */
     public function make($content = '', $status = 200, array $headers = [])
@@ -29,10 +29,10 @@ class ResponseFactory
     /**
      * Return a new JSON response from the application.
      *
-     * @param  mixed  $data
-     * @param  int  $status
-     * @param  array  $headers
-     * @param  int  $options
+     * @param mixed $data
+     * @param int   $status
+     * @param int   $options
+     *
      * @return \Illuminate\Http\JsonResponse
      */
     public function json($data = [], $status = 200, array $headers = [], $options = 0)
@@ -43,11 +43,11 @@ class ResponseFactory
     /**
      * Create a new JSONP response instance.
      *
-     * @param  string  $callback
-     * @param  mixed  $data
-     * @param  int  $status
-     * @param  array  $headers
-     * @param  int  $options
+     * @param string $callback
+     * @param mixed  $data
+     * @param int    $status
+     * @param int    $options
+     *
      * @return \Illuminate\Http\JsonResponse
      */
     public function jsonp($callback, $data = [], $status = 200, array $headers = [], $options = 0)
@@ -58,9 +58,9 @@ class ResponseFactory
     /**
      * Create a new streamed response instance.
      *
-     * @param  \Closure  $callback
-     * @param  int  $status
-     * @param  array  $headers
+     * @param \Closure $callback
+     * @param int      $status
+     *
      * @return \Symfony\Component\HttpFoundation\StreamedResponse
      */
     public function stream($callback, $status = 200, array $headers = [])
@@ -71,10 +71,10 @@ class ResponseFactory
     /**
      * Create a new streamed response instance as a file download.
      *
-     * @param  \Closure  $callback
-     * @param  string|null  $name
-     * @param  array  $headers
-     * @param  string|null  $disposition
+     * @param \Closure    $callback
+     * @param string|null $name
+     * @param string|null $disposition
+     *
      * @return \Symfony\Component\HttpFoundation\StreamedResponse
      */
     public function streamDownload($callback, $name = null, array $headers = [], $disposition = 'attachment')
@@ -95,10 +95,10 @@ class ResponseFactory
     /**
      * Create a new file download response.
      *
-     * @param  \SplFileInfo|string  $file
-     * @param  string  $name
-     * @param  array  $headers
-     * @param  null|string  $disposition
+     * @param \SplFileInfo|string $file
+     * @param string              $name
+     * @param string|null         $disposition
+     *
      * @return \Symfony\Component\HttpFoundation\BinaryFileResponse
      */
     public function download($file, $name = null, array $headers = [], $disposition = 'attachment')
@@ -115,7 +115,8 @@ class ResponseFactory
     /**
      * Convert the string to ASCII characters that are equivalent to the given name.
      *
-     * @param  string  $name
+     * @param string $name
+     *
      * @return string
      */
     protected function fallbackName($name)
@@ -126,8 +127,8 @@ class ResponseFactory
     /**
      * Return the raw contents of a binary file.
      *
-     * @param  \SplFileInfo|string  $file
-     * @param  array  $headers
+     * @param \SplFileInfo|string $file
+     *
      * @return \Symfony\Component\HttpFoundation\BinaryFileResponse
      */
     public function file($file, array $headers = [])

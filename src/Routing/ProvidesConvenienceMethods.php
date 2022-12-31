@@ -30,7 +30,6 @@ trait ProvidesConvenienceMethods
     /**
      * Set the response builder callback.
      *
-     * @param  \Closure  $callback
      * @return void
      */
     public static function buildResponseUsing(BaseClosure $callback)
@@ -41,7 +40,6 @@ trait ProvidesConvenienceMethods
     /**
      * Set the error formatter callback.
      *
-     * @param  \Closure  $callback
      * @return void
      */
     public static function formatErrorsUsing(BaseClosure $callback)
@@ -52,10 +50,6 @@ trait ProvidesConvenienceMethods
     /**
      * Validate the given request with the given rules.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  array  $rules
-     * @param  array  $messages
-     * @param  array  $customAttributes
      * @return array
      *
      * @throws \Illuminate\Validation\ValidationException
@@ -74,8 +68,6 @@ trait ProvidesConvenienceMethods
     /**
      * Get the request input based on the given validation rules.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  array  $rules
      * @return array
      */
     protected function extractInputFromRules(Request $request, array $rules)
@@ -88,8 +80,8 @@ trait ProvidesConvenienceMethods
     /**
      * Throw the failed validation exception.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \Illuminate\Contracts\Validation\Validator  $validator
+     * @param \Illuminate\Contracts\Validation\Validator $validator
+     *
      * @return void
      *
      * @throws \Illuminate\Validation\ValidationException
@@ -104,8 +96,6 @@ trait ProvidesConvenienceMethods
     /**
      * Build a response based on the given errors.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  array  $errors
      * @return \Illuminate\Http\JsonResponse|mixed
      */
     protected function buildFailedValidationResponse(Request $request, array $errors)
@@ -120,7 +110,6 @@ trait ProvidesConvenienceMethods
     /**
      * Format validation errors.
      *
-     * @param  \Illuminate\Validation\Validator  $validator
      * @return array|mixed
      */
     protected function formatValidationErrors(Validator $validator)
@@ -135,8 +124,9 @@ trait ProvidesConvenienceMethods
     /**
      * Authorize a given action against a set of arguments.
      *
-     * @param  mixed  $ability
-     * @param  mixed|array  $arguments
+     * @param mixed       $ability
+     * @param mixed|array $arguments
+     *
      * @return \Illuminate\Auth\Access\Response
      *
      * @throws \Illuminate\Auth\Access\AuthorizationException
@@ -151,9 +141,10 @@ trait ProvidesConvenienceMethods
     /**
      * Authorize a given action for a user.
      *
-     * @param  \Illuminate\Contracts\Auth\Authenticatable|mixed  $user
-     * @param  mixed  $ability
-     * @param  mixed|array  $arguments
+     * @param \Illuminate\Contracts\Auth\Authenticatable|mixed $user
+     * @param mixed                                            $ability
+     * @param mixed|array                                      $arguments
+     *
      * @return \Illuminate\Auth\Access\Response
      *
      * @throws \Illuminate\Auth\Access\AuthorizationException
@@ -168,8 +159,9 @@ trait ProvidesConvenienceMethods
     /**
      * Guesses the ability's name if it wasn't provided.
      *
-     * @param  mixed  $ability
-     * @param  mixed|array  $arguments
+     * @param mixed       $ability
+     * @param mixed|array $arguments
+     *
      * @return array
      */
     protected function parseAbilityAndArguments($ability, $arguments)
@@ -184,7 +176,8 @@ trait ProvidesConvenienceMethods
     /**
      * Dispatch a job to its appropriate handler.
      *
-     * @param  mixed  $job
+     * @param mixed $job
+     *
      * @return mixed
      */
     public function dispatch($job)
@@ -195,8 +188,9 @@ trait ProvidesConvenienceMethods
     /**
      * Dispatch a command to its appropriate handler in the current process.
      *
-     * @param  mixed  $job
-     * @param  mixed  $handler
+     * @param mixed $job
+     * @param mixed $handler
+     *
      * @return mixed
      */
     public function dispatchNow($job, $handler = null)

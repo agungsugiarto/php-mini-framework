@@ -2,45 +2,45 @@
 
 namespace Mini\Framework;
 
-use Throwable;
-use RuntimeException;
-use League\Route\Route;
-use League\Route\Router;
-use Illuminate\Support\Str;
-use Psr\Log\LoggerInterface;
-use Illuminate\Log\LogManager;
-use Illuminate\Support\Composer;
-use Illuminate\Container\Container;
-use Illuminate\Filesystem\Filesystem;
-use Psr\Container\ContainerInterface;
+use Illuminate\Broadcasting\BroadcastServiceProvider;
 use Illuminate\Bus\BusServiceProvider;
-use Illuminate\Support\Facades\Facade;
-use Psr\Http\Message\RequestInterface;
-use Illuminate\Support\ServiceProvider;
-use Psr\Http\Message\ResponseInterface;
-use Illuminate\Contracts\Bus\Dispatcher;
-use Illuminate\View\ViewServiceProvider;
 use Illuminate\Cache\CacheServiceProvider;
-use Illuminate\Queue\QueueServiceProvider;
-use Illuminate\Events\EventServiceProvider;
-use Illuminate\Hashing\HashServiceProvider;
-use Laminas\Diactoros\ServerRequestFactory;
-use Psr\Http\Message\ServerRequestInterface;
-use Psr\Http\Server\RequestHandlerInterface;
+use Illuminate\Config\Repository as ConfigRepository;
+use Illuminate\Container\Container;
+use Illuminate\Contracts\Broadcasting\Broadcaster;
 use Illuminate\Contracts\Broadcasting\Factory;
-use League\Route\Strategy\ApplicationStrategy;
+use Illuminate\Contracts\Bus\Dispatcher;
 use Illuminate\Database\DatabaseServiceProvider;
 use Illuminate\Database\MigrationServiceProvider;
-use Mini\Framework\Console\ConsoleServiceProvider;
-use Illuminate\Contracts\Broadcasting\Broadcaster;
-use Laminas\HttpHandlerRunner\Emitter\SapiEmitter;
 use Illuminate\Encryption\EncryptionServiceProvider;
+use Illuminate\Events\EventServiceProvider;
+use Illuminate\Filesystem\Filesystem;
 use Illuminate\Filesystem\FilesystemServiceProvider;
+use Illuminate\Hashing\HashServiceProvider;
+use Illuminate\Log\LogManager;
 use Illuminate\Pagination\PaginationServiceProvider;
-use Illuminate\Validation\ValidationServiceProvider;
-use Illuminate\Broadcasting\BroadcastServiceProvider;
-use Illuminate\Config\Repository as ConfigRepository;
+use Illuminate\Queue\QueueServiceProvider;
+use Illuminate\Support\Composer;
+use Illuminate\Support\Facades\Facade;
+use Illuminate\Support\ServiceProvider;
+use Illuminate\Support\Str;
 use Illuminate\Translation\TranslationServiceProvider;
+use Illuminate\Validation\ValidationServiceProvider;
+use Illuminate\View\ViewServiceProvider;
+use Laminas\Diactoros\ServerRequestFactory;
+use Laminas\HttpHandlerRunner\Emitter\SapiEmitter;
+use League\Route\Route;
+use League\Route\Router;
+use League\Route\Strategy\ApplicationStrategy;
+use Mini\Framework\Console\ConsoleServiceProvider;
+use Psr\Container\ContainerInterface;
+use Psr\Http\Message\RequestInterface;
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
+use Psr\Http\Server\RequestHandlerInterface;
+use Psr\Log\LoggerInterface;
+use RuntimeException;
+use Throwable;
 
 class Application extends Container implements RequestHandlerInterface
 {
@@ -119,7 +119,8 @@ class Application extends Container implements RequestHandlerInterface
     /**
      * Create a new Lumen application instance.
      *
-     * @param  string|null  $basePath
+     * @param string|null $basePath
+     *
      * @return void
      */
     public function __construct($basePath = null)
@@ -179,7 +180,7 @@ class Application extends Container implements RequestHandlerInterface
                         if (class_exists($class)) {
                             return new $class();
                         }
-                
+
                         return $class;
                     }
                 };
@@ -244,6 +245,7 @@ class Application extends Container implements RequestHandlerInterface
      * Get or check the current application environment.
      *
      * @param  mixed
+     *
      * @return string
      */
     public function environment()
@@ -268,7 +270,6 @@ class Application extends Container implements RequestHandlerInterface
     /**
      * Determine if the given service provider is loaded.
      *
-     * @param  string  $provider
      * @return bool
      */
     public function providerIsLoaded(string $provider)
@@ -279,7 +280,8 @@ class Application extends Container implements RequestHandlerInterface
     /**
      * Register a service provider with the application.
      *
-     * @param  \Illuminate\Support\ServiceProvider|string  $provider
+     * @param \Illuminate\Support\ServiceProvider|string $provider
+     *
      * @return void
      */
     public function register($provider)
@@ -306,7 +308,8 @@ class Application extends Container implements RequestHandlerInterface
     /**
      * Register a deferred provider and service.
      *
-     * @param  string  $provider
+     * @param string $provider
+     *
      * @return void
      */
     public function registerDeferredProvider($provider)
@@ -333,7 +336,6 @@ class Application extends Container implements RequestHandlerInterface
     /**
      * Boot the given service provider.
      *
-     * @param  \Illuminate\Support\ServiceProvider  $provider
      * @return mixed
      */
     protected function bootProvider(ServiceProvider $provider)
@@ -346,8 +348,8 @@ class Application extends Container implements RequestHandlerInterface
     /**
      * Resolve the given type from the container.
      *
-     * @param  string  $abstract
-     * @param  array  $parameters
+     * @param string $abstract
+     *
      * @return mixed
      */
     public function make($abstract, array $parameters = [])
@@ -625,9 +627,10 @@ class Application extends Container implements RequestHandlerInterface
     /**
      * Configure and load the given component and provider.
      *
-     * @param  string  $config
-     * @param  array|string  $providers
-     * @param  string|null  $return
+     * @param string       $config
+     * @param array|string $providers
+     * @param string|null  $return
+     *
      * @return mixed
      */
     public function loadComponent($config, $providers, $return = null)
@@ -644,7 +647,8 @@ class Application extends Container implements RequestHandlerInterface
     /**
      * Load a configuration file into the application.
      *
-     * @param  string  $name
+     * @param string $name
+     *
      * @return void
      */
     public function configure($name)
@@ -667,7 +671,8 @@ class Application extends Container implements RequestHandlerInterface
      *
      * If no name is provided, then we'll return the path to the config folder.
      *
-     * @param  string|null  $name
+     * @param string|null $name
+     *
      * @return string
      */
     public function getConfigurationPath($name = null)
@@ -694,8 +699,9 @@ class Application extends Container implements RequestHandlerInterface
     /**
      * Register the facades for the application.
      *
-     * @param  bool  $aliases
-     * @param  array  $userAliases
+     * @param bool  $aliases
+     * @param array $userAliases
+     *
      * @return void
      */
     public function withFacades($aliases = true, $userAliases = [])
@@ -710,7 +716,8 @@ class Application extends Container implements RequestHandlerInterface
     /**
      * Register the aliases for the application.
      *
-     * @param  array  $userAliases
+     * @param array $userAliases
+     *
      * @return void
      */
     public function withAliases($userAliases = [])
@@ -760,7 +767,8 @@ class Application extends Container implements RequestHandlerInterface
     /**
      * Get the base path for the application.
      *
-     * @param  string  $path
+     * @param string $path
+     *
      * @return string
      */
     public function basePath($path = '')
@@ -781,7 +789,8 @@ class Application extends Container implements RequestHandlerInterface
     /**
      * Get the path to the application configuration files.
      *
-     * @param  string  $path
+     * @param string $path
+     *
      * @return string
      */
     public function configPath($path = '')
@@ -792,7 +801,8 @@ class Application extends Container implements RequestHandlerInterface
     /**
      * Get the path to the database directory.
      *
-     * @param  string  $path
+     * @param string $path
+     *
      * @return string
      */
     public function databasePath($path = '')
@@ -803,7 +813,8 @@ class Application extends Container implements RequestHandlerInterface
     /**
      * Get the path to the language files.
      *
-     * @param  string  $path
+     * @param string $path
+     *
      * @return string
      */
     public function langPath($path = '')
@@ -814,7 +825,8 @@ class Application extends Container implements RequestHandlerInterface
     /**
      * Get the storage path for the application.
      *
-     * @param  string|null  $path
+     * @param string|null $path
+     *
      * @return string
      */
     public function storagePath($path = '')
@@ -825,7 +837,8 @@ class Application extends Container implements RequestHandlerInterface
     /**
      * Set the storage directory.
      *
-     * @param  string  $path
+     * @param string $path
+     *
      * @return $this
      */
     public function useStoragePath($path)
@@ -840,7 +853,8 @@ class Application extends Container implements RequestHandlerInterface
     /**
      * Get the path to the resources directory.
      *
-     * @param  string|null  $path
+     * @param string|null $path
+     *
      * @return string
      */
     public function resourcePath($path = '')
@@ -881,7 +895,8 @@ class Application extends Container implements RequestHandlerInterface
     /**
      * Prepare the application to execute a console command.
      *
-     * @param  bool  $aliases
+     * @param bool $aliases
+     *
      * @return void
      */
     public function prepareForConsoleCommand($aliases = true)
@@ -971,7 +986,8 @@ class Application extends Container implements RequestHandlerInterface
     /**
      * Set the current application locale.
      *
-     * @param  string  $locale
+     * @param string $locale
+     *
      * @return void
      */
     public function setLocale($locale)
@@ -983,7 +999,8 @@ class Application extends Container implements RequestHandlerInterface
     /**
      * Determine if application locale is the given locale.
      *
-     * @param  string  $locale
+     * @param string $locale
+     *
      * @return bool
      */
     public function isLocale($locale)
@@ -994,7 +1011,8 @@ class Application extends Container implements RequestHandlerInterface
     /**
      * Register a terminating callback with the application.
      *
-     * @param  callable|string  $callback
+     * @param callable|string $callback
+     *
      * @return $this
      */
     public function terminating($callback)

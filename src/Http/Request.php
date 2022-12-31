@@ -12,7 +12,8 @@ class Request extends BaseRequest
     /**
      * Determine if the route name matches a given pattern.
      *
-     * @param  mixed  $patterns
+     * @param mixed $patterns
+     *
      * @return bool
      */
     public function routeIs(...$patterns)
@@ -33,8 +34,9 @@ class Request extends BaseRequest
     /**
      * Get the route handling the request.
      *
-     * @param  string|null  $param
-     * @param  mixed  $default
+     * @param string|null $param
+     * @param mixed       $default
+     *
      * @return array|string
      */
     public function route($param = null, $default = null)
@@ -69,8 +71,7 @@ class Request extends BaseRequest
     /**
      * Determine if the given offset exists.
      *
-     * @param  string  $offset
-     * @return bool
+     * @param string $offset
      */
     public function offsetExists($offset): bool
     {

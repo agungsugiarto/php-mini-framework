@@ -2,25 +2,25 @@
 
 namespace Mini\Framework\Concerns;
 
-use Exception;
-use Throwable;
 use ErrorException;
-use Illuminate\Log\LogManager;
-use Mini\Framework\Exceptions\Handler;
+use Exception;
 use Illuminate\Contracts\Debug\ExceptionHandler;
+use Illuminate\Log\LogManager;
 use League\Route\Http\Exception as HttpException;
 use League\Route\Http\Exception\NotFoundException;
+use Mini\Framework\Exceptions\Handler;
 use Symfony\Component\Console\Output\ConsoleOutput;
 use Symfony\Component\ErrorHandler\Error\FatalError;
+use Throwable;
 
 trait RegistersExceptionHandlers
 {
     /**
      * Throw an HttpException with the given data.
      *
-     * @param  int  $code
-     * @param  string  $message
-     * @param  array  $headers
+     * @param int    $code
+     * @param string $message
+     *
      * @return void
      *
      * @throws \League\Route\Http\Exception\HttpExceptionInterface
@@ -59,11 +59,12 @@ trait RegistersExceptionHandlers
     /**
      * Report PHP deprecations, or convert PHP errors to ErrorException instances.
      *
-     * @param  int  $level
-     * @param  string  $message
-     * @param  string  $file
-     * @param  int  $line
-     * @param  array  $context
+     * @param int    $level
+     * @param string $message
+     * @param string $file
+     * @param int    $line
+     * @param array  $context
+     *
      * @return void
      *
      * @throws \ErrorException
@@ -82,9 +83,10 @@ trait RegistersExceptionHandlers
     /**
      * Reports a deprecation to the "deprecations" logger.
      *
-     * @param  string  $message
-     * @param  string  $file
-     * @param  int  $line
+     * @param string $message
+     * @param string $file
+     * @param int    $line
+     *
      * @return void
      */
     public function handleDeprecation($message, $file, $line)
@@ -141,8 +143,8 @@ trait RegistersExceptionHandlers
     /**
      * Create a new fatal error instance from an error array.
      *
-     * @param  array  $error
-     * @param  int|null  $traceOffset
+     * @param int|null $traceOffset
+     *
      * @return \Symfony\Component\ErrorHandler\Error\FatalError
      */
     protected function fatalErrorFromPhpError(array $error, $traceOffset = null)
@@ -153,7 +155,8 @@ trait RegistersExceptionHandlers
     /**
      * Determine if the error level is a deprecation.
      *
-     * @param  int  $level
+     * @param int $level
+     *
      * @return bool
      */
     protected function isDeprecation($level)
@@ -164,7 +167,8 @@ trait RegistersExceptionHandlers
     /**
      * Determine if the error type is fatal.
      *
-     * @param  int  $type
+     * @param int $type
+     *
      * @return bool
      */
     protected function isFatal($type)
@@ -175,7 +179,6 @@ trait RegistersExceptionHandlers
     /**
      * Send the exception to the handler and return the response.
      *
-     * @param  \Throwable  $e
      * @return \Psr\Http\Message\ResponseInterface
      */
     protected function sendExceptionToHandler(Throwable $e)
@@ -190,7 +193,6 @@ trait RegistersExceptionHandlers
     /**
      * Handle an uncaught exception instance.
      *
-     * @param  \Throwable  $e
      * @return void
      */
     protected function handleException(Throwable $e)
