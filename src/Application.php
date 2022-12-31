@@ -2,43 +2,33 @@
 
 namespace Mini\Framework;
 
-use Illuminate\Broadcasting\BroadcastServiceProvider;
-use Illuminate\Bus\BusServiceProvider;
-use Illuminate\Cache\CacheServiceProvider;
-use Illuminate\Config\Repository as ConfigRepository;
-use Illuminate\Container\Container;
-use Illuminate\Contracts\Broadcasting\Broadcaster;
-use Illuminate\Contracts\Broadcasting\Factory;
-use Illuminate\Contracts\Bus\Dispatcher;
-use Illuminate\Database\DatabaseServiceProvider;
-use Illuminate\Database\MigrationServiceProvider;
-use Illuminate\Encryption\EncryptionServiceProvider;
-use Illuminate\Events\EventServiceProvider;
-use Illuminate\Filesystem\Filesystem;
-use Illuminate\Filesystem\FilesystemServiceProvider;
-use Illuminate\Hashing\HashServiceProvider;
-use Illuminate\Log\LogManager;
-use Illuminate\Pagination\PaginationServiceProvider;
-use Illuminate\Queue\QueueServiceProvider;
-use Illuminate\Support\Composer;
-use Illuminate\Support\Facades\Facade;
-use Illuminate\Support\ServiceProvider;
-use Illuminate\Support\Str;
-use Illuminate\Translation\TranslationServiceProvider;
-use Illuminate\Validation\ValidationServiceProvider;
-use Illuminate\View\ViewServiceProvider;
-use Laminas\Diactoros\ServerRequestFactory;
-use Laminas\HttpHandlerRunner\Emitter\SapiEmitter;
-use League\Route\Strategy\ApplicationStrategy;
-use Mini\Framework\Console\ConsoleServiceProvider;
-use Mini\Framework\Routing\Router;
-use Psr\Http\Message\RequestInterface;
-use Psr\Http\Message\ResponseInterface;
-use Psr\Http\Message\ServerRequestInterface;
-use Psr\Http\Server\RequestHandlerInterface;
-use Psr\Log\LoggerInterface;
-use RuntimeException;
 use Throwable;
+use RuntimeException;
+use Psr\Log\LoggerInterface;
+use Illuminate\Log\LogManager;
+use Mini\Framework\Routing\{Router, Strategy};
+use Illuminate\Container\Container;
+use Illuminate\Bus\BusServiceProvider;
+use Illuminate\View\ViewServiceProvider;
+use Illuminate\Cache\CacheServiceProvider;
+use Illuminate\Queue\QueueServiceProvider;
+use Illuminate\Events\EventServiceProvider;
+use Illuminate\Hashing\HashServiceProvider;
+use Laminas\Diactoros\ServerRequestFactory;
+use Psr\Http\Server\RequestHandlerInterface;
+use Laminas\HttpHandlerRunner\Emitter\SapiEmitter;
+use Mini\Framework\Console\ConsoleServiceProvider;
+use Illuminate\Encryption\EncryptionServiceProvider;
+use Illuminate\Pagination\PaginationServiceProvider;
+use Illuminate\Validation\ValidationServiceProvider;
+use Illuminate\Broadcasting\BroadcastServiceProvider;
+use Illuminate\Config\Repository as ConfigRepository;
+use Illuminate\Translation\TranslationServiceProvider;
+use Illuminate\Filesystem\{Filesystem, FilesystemServiceProvider};
+use Illuminate\Support\{Composer, Facades\Facade, ServiceProvider, Str};
+use Illuminate\Database\{DatabaseServiceProvider, MigrationServiceProvider};
+use Psr\Http\Message\{RequestInterface, ResponseInterface, ServerRequestInterface};
+use Illuminate\Contracts\{Broadcasting\Broadcaster, Broadcasting\Factory, Bus\Dispatcher};
 
 class Application extends Container implements RequestHandlerInterface
 {
@@ -157,7 +147,7 @@ class Application extends Container implements RequestHandlerInterface
     public function bootstrapRouter()
     {
         $this->router = (new Router)->setStrategy(
-            (new ApplicationStrategy)->setContainer($this)
+            (new Strategy)->setContainer($this)
         );
     }
 

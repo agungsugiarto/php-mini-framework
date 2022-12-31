@@ -204,7 +204,7 @@ trait RegistersExceptionHandlers
         if ($this->runningInConsole()) {
             $handler->renderForConsole(new ConsoleOutput, $e);
         } else {
-            $handler->render($this->make('request'), $e)->send();
+            $handler->render($this->make('request'), $e);
         }
     }
 
