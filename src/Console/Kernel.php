@@ -7,7 +7,7 @@ use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Console\Scheduling\ScheduleRunCommand;
 use Illuminate\Contracts\Console\Kernel as KernelContract;
 use Illuminate\Contracts\Debug\ExceptionHandler;
-use Illuminate\Http\Request;
+use Laminas\Diactoros\ServerRequestFactory;
 use Mini\Framework\Application;
 use Mini\Framework\Exceptions\Handler;
 use RuntimeException;
@@ -82,9 +82,9 @@ class Kernel implements KernelContract
             ]);
         }
 
-        $app->instance('request', Request::create(
-            $uri, 'GET', [], [], [], $server
-        ));
+        $app->instance('request',
+            (new ServerRequestFactory)->createServerRequest('GET', $uri, $server)
+        );
     }
 
     /**
