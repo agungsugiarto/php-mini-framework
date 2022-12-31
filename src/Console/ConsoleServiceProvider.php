@@ -2,7 +2,6 @@
 
 namespace Mini\Framework\Console;
 
-use Illuminate\Auth\Console\ClearResetsCommand;
 use Illuminate\Cache\Console\CacheTableCommand;
 use Illuminate\Cache\Console\ClearCommand as CacheClearCommand;
 use Illuminate\Cache\Console\ForgetCommand as CacheForgetCommand;
@@ -44,7 +43,6 @@ class ConsoleServiceProvider extends ServiceProvider
     protected $commands = [
         'CacheClear' => 'command.cache.clear',
         'CacheForget' => 'command.cache.forget',
-        'ClearResets' => 'command.auth.resets.clear',
         'Migrate' => 'command.migrate',
         'MigrateInstall' => 'command.migrate.install',
         'MigrateFresh' => 'command.migrate.fresh',
@@ -141,18 +139,6 @@ class ConsoleServiceProvider extends ServiceProvider
     {
         $this->app->singleton('command.cache.table', function ($app) {
             return new CacheTableCommand($app['files'], $app['composer']);
-        });
-    }
-
-    /**
-     * Register the command.
-     *
-     * @return void
-     */
-    protected function registerClearResetsCommand()
-    {
-        $this->app->singleton('command.auth.resets.clear', function () {
-            return new ClearResetsCommand;
         });
     }
 

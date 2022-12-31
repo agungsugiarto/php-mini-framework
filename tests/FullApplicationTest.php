@@ -5,7 +5,10 @@ use Mini\Framework\Application;
 use PHPUnit\Framework\TestCase;
 use Laminas\Diactoros\ServerRequestFactory;
 use Laminas\Diactoros\Response\TextResponse;
+use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
+use Psr\Http\Server\MiddlewareInterface;
+use Psr\Http\Server\RequestHandlerInterface;
 
 class FullApplicationTest extends TestCase
 {
@@ -42,24 +45,28 @@ class FullApplicationTest extends TestCase
     //     $this->assertEquals(200, $response->getStatusCode());
     // }
 
-    // public function testAddRouteMultipleMethodRequest()
-    // {
-    //     $app = new Application;
+    public function testAddRouteMultipleMethodRequest()
+    {
+        $app = new Application;
 
-    //     $app->router->addRoute(['GET', 'POST'], '/', function () {
-    //         return response('Hello World');
-    //     });
+        $app->router->get('/', function () {
+            return new TextResponse('Hello World');
+        });
 
-    //     $response = $app->handle(Request::create('/', 'GET'));
+        $app->router->post('/', function () {
+            return new TextResponse('Hello World');
+        });
 
-    //     $this->assertEquals(200, $response->getStatusCode());
-    //     $this->assertEquals('Hello World', $response->getContent());
+        $response = $app->handle((new ServerRequestFactory)->createServerRequest('GET', '/'));
 
-    //     $response = $app->handle(Request::create('/', 'POST'));
+        $this->assertEquals(200, $response->getStatusCode());
+        $this->assertEquals('Hello World', $response->getBody()->getContents());
 
-    //     $this->assertEquals(200, $response->getStatusCode());
-    //     $this->assertEquals('Hello World', $response->getContent());
-    // }
+        $response = $app->handle((new ServerRequestFactory)->createServerRequest('POST', '/'));
+
+        $this->assertEquals(200, $response->getStatusCode());
+        $this->assertEquals('Hello World', $response->getBody()->getContents());
+    }
 
     // public function testRequestWithParameters()
     // {
@@ -91,21 +98,21 @@ class FullApplicationTest extends TestCase
     //     $this->assertEquals('something', $response->getContent());
     // }
 
-    // public function testGlobalMiddleware()
-    // {
-    //     $app = new Application;
+    public function testGlobalMiddleware()
+    {
+        $app = new Application;
 
-    //     $app->middleware(['LumenTestMiddleware']);
+        $app->router->lazyPrependMiddleware(MiniTestMiddleware::class);
 
-    //     $app->router->get('/', function () {
-    //         return response('Hello World');
-    //     });
+        $app->router->get('/', function () {
+            return new TextResponse('Hello World');
+        });
 
-    //     $response = $app->handle(Request::create('/', 'GET'));
+        $response = $app->handle((new ServerRequestFactory)->createServerRequest('GET', '/'));
 
-    //     $this->assertEquals(200, $response->getStatusCode());
-    //     $this->assertEquals('Middleware', $response->getContent());
-    // }
+        $this->assertEquals(200, $response->getStatusCode());
+        $this->assertEquals('Middleware', $response->getBody()->getContents());
+    }
 
     // public function testRouteMiddleware()
     // {
@@ -867,13 +874,13 @@ class FullApplicationTest extends TestCase
 //     }
 // }
 
-// class LumenTestMiddleware
-// {
-//     public function handle($request, $next)
-//     {
-//         return response('Middleware');
-//     }
-// }
+class MiniTestMiddleware implements MiddlewareInterface
+{
+    public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
+    {
+        return new TextResponse('Middleware');
+    }
+}
 
 // class LumenTestPlainMiddleware
 // {

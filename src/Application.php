@@ -29,11 +29,9 @@ use Illuminate\Validation\ValidationServiceProvider;
 use Illuminate\View\ViewServiceProvider;
 use Laminas\Diactoros\ServerRequestFactory;
 use Laminas\HttpHandlerRunner\Emitter\SapiEmitter;
-use League\Route\Route;
-use League\Route\Router;
 use League\Route\Strategy\ApplicationStrategy;
 use Mini\Framework\Console\ConsoleServiceProvider;
-use Psr\Container\ContainerInterface;
+use Mini\Framework\Routing\Router;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -105,7 +103,7 @@ class Application extends Container implements RequestHandlerInterface
     /**
      * The Router instance.
      *
-     * @var \League\Route\Router
+     * @var Router
      */
     public $router;
 
@@ -158,38 +156,7 @@ class Application extends Container implements RequestHandlerInterface
      */
     public function bootstrapRouter()
     {
-        $this->router = (new class extends Router
-        {
-            /**
-             * {@inheritdoc}
-             */
-            public function map(string $method, string $path, $handler): Route
-            {
-                $path = sprintf('/%s', ltrim($path, '/'));
-                $route = new class($method, $path, $handler) extends Route
-                {
-                    /**
-                     * {@inheritdoc}
-                     */
-                    protected function resolve(string $class, ?ContainerInterface $container = null)
-                    {
-                        if ($container instanceof Container) {
-                            return $container->make($class);
-                        }
-
-                        if (class_exists($class)) {
-                            return new $class();
-                        }
-
-                        return $class;
-                    }
-                };
-
-                $this->routes[] = $route;
-
-                return $route;
-            }
-        })->setStrategy(
+        $this->router = (new Router)->setStrategy(
             (new ApplicationStrategy)->setContainer($this)
         );
     }
@@ -1074,7 +1041,7 @@ class Application extends Container implements RequestHandlerInterface
             \Illuminate\Redis\Connections\Connection::class => 'redis.connection',
             \Illuminate\Contracts\Redis\Connection::class => 'redis.connection',
             'request' => \Psr\Http\Message\ServerRequestInterface::class,
-            \League\Route\Router::class => 'router',
+            \Mini\Framework\Routing\Router::class => 'router',
             \Illuminate\Contracts\Translation\Translator::class => 'translator',
             \Mini\Framework\Routing\UrlGenerator::class => 'url',
             \Illuminate\Contracts\Validation\Factory::class => 'validator',
