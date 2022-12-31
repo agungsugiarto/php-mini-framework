@@ -212,6 +212,11 @@ class Application extends Container implements RequestHandlerInterface
         return $this->router->dispatch($request);
     }
 
+    /**
+     * Run the application and send the response.
+     *
+     * @return void
+     */
     public function run(ServerRequestInterface $request = null)
     {
         try {
