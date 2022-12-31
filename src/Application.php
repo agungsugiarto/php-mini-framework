@@ -2,45 +2,43 @@
 
 namespace Mini\Framework;
 
-use Illuminate\Broadcasting\BroadcastServiceProvider;
-use Illuminate\Bus\BusServiceProvider;
-use Illuminate\Cache\CacheServiceProvider;
-use Illuminate\Config\Repository as ConfigRepository;
-use Illuminate\Container\Container;
-use Illuminate\Contracts\Broadcasting\Broadcaster;
-use Illuminate\Contracts\Broadcasting\Factory;
-use Illuminate\Contracts\Bus\Dispatcher;
-use Illuminate\Database\DatabaseServiceProvider;
-use Illuminate\Database\MigrationServiceProvider;
-use Illuminate\Encryption\EncryptionServiceProvider;
-use Illuminate\Events\EventServiceProvider;
-use Illuminate\Filesystem\Filesystem;
-use Illuminate\Filesystem\FilesystemServiceProvider;
-use Illuminate\Hashing\HashServiceProvider;
-use Illuminate\Log\LogManager;
-use Illuminate\Pagination\PaginationServiceProvider;
-use Illuminate\Queue\QueueServiceProvider;
-use Illuminate\Support\Composer;
-use Illuminate\Support\Facades\Facade;
-use Illuminate\Support\ServiceProvider;
+use Throwable;
+use RuntimeException;
 use Illuminate\Support\Str;
-use Illuminate\Translation\TranslationServiceProvider;
-use Illuminate\Validation\ValidationServiceProvider;
-use Illuminate\View\ViewServiceProvider;
-use Laminas\Diactoros\ServerRequestFactory;
-use Laminas\HttpHandlerRunner\Emitter\SapiEmitter;
-use League\Route\Route;
-use League\Route\Router;
-use League\Route\Strategy\ApplicationStrategy;
-use Mini\Framework\Console\ConsoleServiceProvider;
-use Psr\Container\ContainerInterface;
+use Psr\Log\LoggerInterface;
+use Illuminate\Log\LogManager;
+use Illuminate\Support\Composer;
+use Illuminate\Container\Container;
+use Illuminate\Filesystem\Filesystem;
+use Illuminate\Bus\BusServiceProvider;
+use Illuminate\Support\Facades\Facade;
 use Psr\Http\Message\RequestInterface;
+use Illuminate\Support\ServiceProvider;
 use Psr\Http\Message\ResponseInterface;
+use Illuminate\Contracts\Bus\Dispatcher;
+use Illuminate\View\ViewServiceProvider;
+use Illuminate\Cache\CacheServiceProvider;
+use Illuminate\Queue\QueueServiceProvider;
+use Illuminate\Events\EventServiceProvider;
+use Illuminate\Hashing\HashServiceProvider;
+use Laminas\Diactoros\ServerRequestFactory;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
-use Psr\Log\LoggerInterface;
-use RuntimeException;
-use Throwable;
+use Illuminate\Contracts\Broadcasting\Factory;
+use League\Route\Strategy\ApplicationStrategy;
+use Illuminate\Database\DatabaseServiceProvider;
+use Illuminate\Database\MigrationServiceProvider;
+use Illuminate\Contracts\Broadcasting\Broadcaster;
+use Laminas\HttpHandlerRunner\Emitter\SapiEmitter;
+use Mini\Framework\Console\ConsoleServiceProvider;
+use Illuminate\Encryption\EncryptionServiceProvider;
+use Illuminate\Filesystem\FilesystemServiceProvider;
+use Illuminate\Pagination\PaginationServiceProvider;
+use Illuminate\Validation\ValidationServiceProvider;
+use Illuminate\Broadcasting\BroadcastServiceProvider;
+use Illuminate\Config\Repository as ConfigRepository;
+use Illuminate\Translation\TranslationServiceProvider;
+use Mini\Framework\Routing\Router;
 
 class Application extends Container implements RequestHandlerInterface
 {
@@ -105,7 +103,7 @@ class Application extends Container implements RequestHandlerInterface
     /**
      * The Router instance.
      *
-     * @var \League\Route\Router
+     * @var Router
      */
     public $router;
 
@@ -158,38 +156,7 @@ class Application extends Container implements RequestHandlerInterface
      */
     public function bootstrapRouter()
     {
-        $this->router = (new class extends Router
-        {
-            /**
-             * {@inheritdoc}
-             */
-            public function map(string $method, string $path, $handler): Route
-            {
-                $path = sprintf('/%s', ltrim($path, '/'));
-                $route = new class($method, $path, $handler) extends Route
-                {
-                    /**
-                     * {@inheritdoc}
-                     */
-                    protected function resolve(string $class, ?ContainerInterface $container = null)
-                    {
-                        if ($container instanceof Container) {
-                            return $container->make($class);
-                        }
-
-                        if (class_exists($class)) {
-                            return new $class();
-                        }
-
-                        return $class;
-                    }
-                };
-
-                $this->routes[] = $route;
-
-                return $route;
-            }
-        })->setStrategy(
+        $this->router = (new Router)->setStrategy(
             (new ApplicationStrategy)->setContainer($this)
         );
     }
@@ -1074,7 +1041,7 @@ class Application extends Container implements RequestHandlerInterface
             \Illuminate\Redis\Connections\Connection::class => 'redis.connection',
             \Illuminate\Contracts\Redis\Connection::class => 'redis.connection',
             'request' => \Psr\Http\Message\ServerRequestInterface::class,
-            \League\Route\Router::class => 'router',
+            \Mini\Framework\Routing\Router::class => 'router',
             \Illuminate\Contracts\Translation\Translator::class => 'translator',
             \Mini\Framework\Routing\UrlGenerator::class => 'url',
             \Illuminate\Contracts\Validation\Factory::class => 'validator',
