@@ -55,13 +55,13 @@ return [
 
         'single' => [
             'driver' => 'single',
-            'path' => storage_path('logs/lumen.log'),
+            'path' => storage_path('logs/mini.log'),
             'level' => 'debug',
         ],
 
         'daily' => [
             'driver' => 'daily',
-            'path' => storage_path('logs/lumen.log'),
+            'path' => storage_path('logs/mini.log'),
             'level' => 'debug',
             'days' => 14,
         ],
