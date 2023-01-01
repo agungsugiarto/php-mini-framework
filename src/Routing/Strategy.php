@@ -4,6 +4,7 @@ namespace Mini\Framework\Routing;
 
 use Illuminate\View\View;
 use Laminas\Diactoros\Response\HtmlResponse;
+use Laminas\Diactoros\Response\JsonResponse;
 use League\Route\Route;
 use League\Route\Strategy\ApplicationStrategy;
 use Psr\Http\Message\ResponseInterface;
@@ -17,6 +18,10 @@ class Strategy extends ApplicationStrategy
 
         if ($response instanceof ResponseInterface) {
             return $this->decorateResponse($response);
+        }
+
+        if (is_string($response) || is_array($response)) {
+            return $this->decorateResponse(new JsonResponse($response));
         }
 
         if ($response instanceof View) {
