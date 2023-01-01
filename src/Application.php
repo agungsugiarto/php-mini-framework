@@ -187,11 +187,9 @@ class Application extends Container implements RequestHandlerInterface
     public function run(ServerRequestInterface $request = null)
     {
         try {
-            $request ??= ServerRequestFactory::fromGlobals(
-                $_SERVER, $_GET, $_POST, $_COOKIE, $_FILES
-            );
-
             $this->boot();
+
+            $request ??= ServerRequestFactory::fromGlobals();
 
             $this->instance(RequestInterface::class, $request);
             $this->instance(ServerRequestInterface::class, $request);
@@ -1043,7 +1041,6 @@ class Application extends Container implements RequestHandlerInterface
             'request' => \Psr\Http\Message\ServerRequestInterface::class,
             \Mini\Framework\Routing\Router::class => 'router',
             \Illuminate\Contracts\Translation\Translator::class => 'translator',
-            \Mini\Framework\Routing\UrlGenerator::class => 'url',
             \Illuminate\Contracts\Validation\Factory::class => 'validator',
             \Illuminate\Contracts\View\Factory::class => 'view',
         ];
