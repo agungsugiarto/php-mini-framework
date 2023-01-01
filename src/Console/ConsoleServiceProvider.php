@@ -32,6 +32,8 @@ use Illuminate\Queue\Console\RetryCommand as QueueRetryCommand;
 use Illuminate\Queue\Console\TableCommand;
 use Illuminate\Queue\Console\WorkCommand as QueueWorkCommand;
 use Illuminate\Support\ServiceProvider;
+use Mini\Framework\Console\Commands\KeyGenerateCommand;
+use Mini\Framework\Console\Commands\ServeCommand;
 
 class ConsoleServiceProvider extends ServiceProvider
 {
@@ -43,6 +45,7 @@ class ConsoleServiceProvider extends ServiceProvider
     protected $commands = [
         'CacheClear' => 'command.cache.clear',
         'CacheForget' => 'command.cache.forget',
+        'KeyGenerate' => 'command.key.generate',
         'Migrate' => 'command.migrate',
         'MigrateInstall' => 'command.migrate.install',
         'MigrateFresh' => 'command.migrate.fresh',
@@ -64,6 +67,7 @@ class ConsoleServiceProvider extends ServiceProvider
         'ScheduleRun' => 'command.schedule.run',
         'ScheduleWork' => 'command.schedule.work',
         'SchemaDump' => 'command.schema.dump',
+        'Serve' => 'command.serve',
     ];
 
     /**
@@ -127,6 +131,18 @@ class ConsoleServiceProvider extends ServiceProvider
     {
         $this->app->singleton('command.cache.forget', function ($app) {
             return new CacheForgetCommand($app['cache']);
+        });
+    }
+
+    /**
+     * Register the command.
+     *
+     * @return void
+     */
+    protected function registerKeyGenerateCommand()
+    {
+        $this->app->singleton('command.key.generate', function ($app) {
+            return new KeyGenerateCommand;
         });
     }
 
@@ -458,6 +474,18 @@ class ConsoleServiceProvider extends ServiceProvider
     {
         $this->app->singleton('command.schema.dump', function () {
             return new DumpCommand;
+        });
+    }
+
+    /**
+     * Register the command.
+     *
+     * @return void
+     */
+    protected function registerServeCommand()
+    {
+        $this->app->singleton('command.serve', function () {
+            return new ServeCommand;
         });
     }
 
