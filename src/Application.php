@@ -2,38 +2,38 @@
 
 namespace Mini\Framework;
 
-use RuntimeException;
-use Illuminate\Support\Str;
-use Psr\Log\LoggerInterface;
-use Illuminate\Log\LogManager;
-use Illuminate\Support\Composer;
-use Mini\Framework\Routing\Router;
-use Illuminate\Container\Container;
-use Illuminate\Filesystem\Filesystem;
+use Illuminate\Broadcasting\BroadcastServiceProvider;
 use Illuminate\Bus\BusServiceProvider;
-use Illuminate\Support\Facades\Facade;
-use Illuminate\Support\ServiceProvider;
-use Illuminate\Contracts\Bus\Dispatcher;
-use Illuminate\View\ViewServiceProvider;
 use Illuminate\Cache\CacheServiceProvider;
-use Illuminate\Queue\QueueServiceProvider;
-use Illuminate\Events\EventServiceProvider;
-use Illuminate\Hashing\HashServiceProvider;
-use Mini\Framework\Concerns\RoutesRequests;
-use Psr\Http\Server\RequestHandlerInterface;
+use Illuminate\Config\Repository as ConfigRepository;
+use Illuminate\Container\Container;
+use Illuminate\Contracts\Broadcasting\Broadcaster;
 use Illuminate\Contracts\Broadcasting\Factory;
+use Illuminate\Contracts\Bus\Dispatcher;
 use Illuminate\Database\DatabaseServiceProvider;
 use Illuminate\Database\MigrationServiceProvider;
-use Illuminate\Contracts\Broadcasting\Broadcaster;
-use Mini\Framework\Console\ConsoleServiceProvider;
 use Illuminate\Encryption\EncryptionServiceProvider;
+use Illuminate\Events\EventServiceProvider;
+use Illuminate\Filesystem\Filesystem;
 use Illuminate\Filesystem\FilesystemServiceProvider;
+use Illuminate\Hashing\HashServiceProvider;
+use Illuminate\Log\LogManager;
 use Illuminate\Pagination\PaginationServiceProvider;
-use Illuminate\Validation\ValidationServiceProvider;
-use Illuminate\Broadcasting\BroadcastServiceProvider;
-use Illuminate\Config\Repository as ConfigRepository;
+use Illuminate\Queue\QueueServiceProvider;
+use Illuminate\Support\Composer;
+use Illuminate\Support\Facades\Facade;
+use Illuminate\Support\ServiceProvider;
+use Illuminate\Support\Str;
 use Illuminate\Translation\TranslationServiceProvider;
+use Illuminate\Validation\ValidationServiceProvider;
+use Illuminate\View\ViewServiceProvider;
 use Mini\Framework\Concerns\RegistersExceptionHandlers;
+use Mini\Framework\Concerns\RoutesRequests;
+use Mini\Framework\Console\ConsoleServiceProvider;
+use Mini\Framework\Routing\Router;
+use Psr\Http\Server\RequestHandlerInterface;
+use Psr\Log\LoggerInterface;
+use RuntimeException;
 
 class Application extends Container implements RequestHandlerInterface
 {

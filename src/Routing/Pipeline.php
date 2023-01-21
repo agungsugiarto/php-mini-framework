@@ -3,7 +3,7 @@
 namespace Mini\Framework\Routing;
 
 use Closure as BaseClosure;
-use Illuminate\Contracts\Debug\ExceptionHandler;;
+use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Pipeline\Pipeline as BasePipeline;
 use Psr\Http\Message\ServerRequestInterface;
 use Throwable;
@@ -38,7 +38,6 @@ class Pipeline extends BasePipeline
     /**
      * Get the initial slice to begin the stack call.
      *
-     * @param  \Closure  $destination
      * @return \Closure
      */
     protected function prepareDestination(BaseClosure $destination)
@@ -55,8 +54,8 @@ class Pipeline extends BasePipeline
     /**
      * Handle the given exception.
      *
-     * @param  mixed  $passable
-     * @param  \Throwable  $e
+     * @param mixed $passable
+     *
      * @return mixed
      */
     protected function handleException($passable, Throwable $e)
