@@ -84,8 +84,6 @@ trait RoutesRequests
     /**
      * Run the application and send the response.
      *
-     * @param \Psr\Http\Message\ServerRequestInterface|null $request
-     *
      * @return void
      */
     public function run(?ServerRequestInterface $request = null)
