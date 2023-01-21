@@ -305,7 +305,7 @@ trait RoutesRequests
         }
 
         if ($instance instanceof Controller) {
-            return $this->callLumenController($instance, $method, $routeInfo);
+            return $this->callController($instance, $method, $routeInfo);
         } else {
             return $this->callControllerCallable(
                 [$instance, $method], $routeInfo[2]
@@ -314,7 +314,7 @@ trait RoutesRequests
     }
 
     /**
-     * Send the request through a Lumen controller.
+     * Send the request through a controller.
      *
      * @param mixed  $instance
      * @param string $method
@@ -322,12 +322,12 @@ trait RoutesRequests
      *
      * @return mixed
      */
-    protected function callLumenController($instance, $method, $routeInfo)
+    protected function callController($instance, $method, $routeInfo)
     {
         $middleware = $instance->getMiddlewareForMethod($method);
 
         if (count($middleware) > 0) {
-            return $this->callLumenControllerWithMiddleware(
+            return $this->callControllerWithMiddleware(
                 $instance, $method, $routeInfo, $middleware
             );
         } else {
@@ -347,7 +347,7 @@ trait RoutesRequests
      *
      * @return mixed
      */
-    protected function callLumenControllerWithMiddleware($instance, $method, $routeInfo, $middleware)
+    protected function callControllerWithMiddleware($instance, $method, $routeInfo, $middleware)
     {
         $middleware = $this->gatherMiddlewareClassNames($middleware);
 
@@ -416,15 +416,12 @@ trait RoutesRequests
      */
     public function prepareResponse($response)
     {
-        if (! $response instanceof ResponseInterface) {
-            $response = (new ResponseFactory)
-                ->createResponse()
-                ->withBody(
-                    (new StreamFactory)->createStream($response)
-                );
+        if ($response instanceof ResponseInterface) {
+            return $response;
         }
 
-        return $response;
+        return (new ResponseFactory)->createResponse()
+            ->withBody((new StreamFactory)->createStream($response));
     }
 
     /**

@@ -1,15 +1,12 @@
 <?php
 
+use Laminas\Diactoros\Response;
 use Mockery as m;
 use Mini\Framework\Application;
 use PHPUnit\Framework\TestCase;
 use Laminas\Diactoros\ServerRequestFactory;
 use Laminas\Diactoros\Response\TextResponse;
-use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
-use Psr\Http\Server\MiddlewareInterface;
-use Psr\Http\Server\RequestHandlerInterface;
-
 class FullApplicationTest extends TestCase
 {
     protected function tearDown(): void
@@ -33,17 +30,17 @@ class FullApplicationTest extends TestCase
         $this->assertInstanceOf(ServerRequestInterface::class, $request);
     }
 
-    // public function testBasicSymfonyRequest()
-    // {
-    //     $app = new Application;
+    public function testBasicLaminasRequest()
+    {
+        $app = new Application;
 
-    //     $app->router->get('/', function () {
-    //         return response('Hello World');
-    //     });
+        $app->router->get('/', function () {
+            return new Response('Hello World');
+        });
 
-    //     $response = $app->handle(SymfonyRequest::create('/', 'GET'));
-    //     $this->assertEquals(200, $response->getStatusCode());
-    // }
+        $response = $app->handle((new ServerRequestFactory)->createServerRequest('GET', '/'));
+        $this->assertEquals(200, $response->getStatusCode());
+    }
 
     public function testAddRouteMultipleMethodRequest()
     {
@@ -68,44 +65,44 @@ class FullApplicationTest extends TestCase
         $this->assertEquals('Hello World', $response->getBody()->getContents());
     }
 
-    // public function testRequestWithParameters()
-    // {
-    //     $app = new Application;
+    public function testRequestWithParameters()
+    {
+        $app = new Application;
 
-    //     $app->router->get('/foo/{bar}/{baz}', function ($bar, $baz) {
-    //         return response($bar.$baz);
-    //     });
+        $app->router->get('/foo/{bar}/{baz}', function ($bar, $baz) {
+            return new TextResponse($bar.$baz);
+        });
 
-    //     $response = $app->handle($request = Request::create('/foo/1/2', 'GET'));
+        $response = $app->handle($request = (new ServerRequestFactory)->createServerRequest('GET', '/foo/1/2'));
 
-    //     $this->assertEquals(200, $response->getStatusCode());
-    //     $this->assertEquals('12', $response->getContent());
+        $this->assertEquals(200, $response->getStatusCode());
+        $this->assertEquals('12', $response->getBody()->getContents());
 
-    //     $this->assertEquals(1, $request->route('bar'));
-    //     $this->assertEquals(2, $request->route('baz'));
-    // }
+        // $this->assertEquals(1, $request->route('bar'));
+        // $this->assertEquals(2, $request->route('baz'));
+    }
 
-    // public function testCallbackRouteWithDefaultParameter()
-    // {
-    //     $app = new Application;
-    //     $app->router->get('/foo-bar/{baz}', function ($baz = 'default-value') {
-    //         return response($baz);
-    //     });
+    public function testCallbackRouteWithDefaultParameter()
+    {
+        $app = new Application;
+        $app->router->get('/foo-bar/{baz}', function ($baz = 'default-value') {
+            return new TextResponse($baz);
+        });
 
-    //     $response = $app->handle(Request::create('/foo-bar/something', 'GET'));
+        $response = $app->handle((new ServerRequestFactory)->createServerRequest('GET', '/foo-bar/something'));
 
-    //     $this->assertEquals(200, $response->getStatusCode());
-    //     $this->assertEquals('something', $response->getContent());
-    // }
+        $this->assertEquals(200, $response->getStatusCode());
+        $this->assertEquals('something', $response->getBody()->getContents());
+    }
 
     public function testGlobalMiddleware()
     {
         $app = new Application;
 
-        $app->router->lazyPrependMiddleware(MiniTestMiddleware::class);
+        $app->middleware(MiniTestMiddleware::class);
 
         $app->router->get('/', function () {
-            return new TextResponse('Hello World');
+            return new Response('Hello World');
         });
 
         $response = $app->handle((new ServerRequestFactory)->createServerRequest('GET', '/'));
@@ -114,93 +111,93 @@ class FullApplicationTest extends TestCase
         $this->assertEquals('Middleware', $response->getBody()->getContents());
     }
 
-    // public function testRouteMiddleware()
-    // {
-    //     $app = new Application;
+    public function testRouteMiddleware()
+    {
+        $app = new Application;
 
-    //     $app->routeMiddleware(['foo' => 'LumenTestMiddleware', 'passing' => 'LumenTestPlainMiddleware']);
+        $app->routeMiddleware(['foo' => 'MiniTestMiddleware', 'passing' => 'MiniTestPlainMiddleware']);
 
-    //     $app->router->get('/', function () {
-    //         return response('Hello World');
-    //     });
+        $app->router->get('/', function () {
+            return new TextResponse('Hello World');
+        });
 
-    //     $app->router->get('/foo', ['middleware' => 'foo', function () {
-    //         return response('Hello World');
-    //     }]);
+        $app->router->get('/foo', ['middleware' => 'foo', function () {
+            return new TextResponse('Hello World');
+        }]);
 
-    //     $app->router->get('/bar', ['middleware' => ['foo'], function () {
-    //         return response('Hello World');
-    //     }]);
+        $app->router->get('/bar', ['middleware' => ['foo'], function () {
+            return new TextResponse('Hello World');
+        }]);
 
-    //     $app->router->get('/fooBar', ['middleware' => 'passing|foo', function () {
-    //         return response('Hello World');
-    //     }]);
+        $app->router->get('/fooBar', ['middleware' => 'passing|foo', function () {
+            return new TextResponse('Hello World');
+        }]);
 
-    //     $response = $app->handle(Request::create('/', 'GET'));
-    //     $this->assertEquals(200, $response->getStatusCode());
-    //     $this->assertEquals('Hello World', $response->getContent());
+        $response = $app->handle((new ServerRequestFactory)->createServerRequest('GET', '/'));
+        $this->assertEquals(200, $response->getStatusCode());
+        $this->assertEquals('Hello World', $response->getBody()->getContents());
 
-    //     $response = $app->handle(Request::create('/foo', 'GET'));
-    //     $this->assertEquals(200, $response->getStatusCode());
-    //     $this->assertEquals('Middleware', $response->getContent());
+        $response = $app->handle((new ServerRequestFactory)->createServerRequest('GET', '/foo'));
+        $this->assertEquals(200, $response->getStatusCode());
+        $this->assertEquals('Middleware', $response->getBody()->getContents());
 
-    //     $response = $app->handle(Request::create('/bar', 'GET'));
-    //     $this->assertEquals(200, $response->getStatusCode());
-    //     $this->assertEquals('Middleware', $response->getContent());
+        $response = $app->handle((new ServerRequestFactory)->createServerRequest('GET', '/bar'));
+        $this->assertEquals(200, $response->getStatusCode());
+        $this->assertEquals('Middleware', $response->getBody()->getContents());
 
-    //     $response = $app->handle(Request::create('/fooBar', 'GET'));
-    //     $this->assertEquals(200, $response->getStatusCode());
-    //     $this->assertEquals('Middleware', $response->getContent());
-    // }
+        $response = $app->handle((new ServerRequestFactory)->createServerRequest('GET', '/fooBar'));
+        $this->assertEquals(200, $response->getStatusCode());
+        $this->assertEquals('Middleware', $response->getBody()->getContents());
+    }
 
-    // public function testGlobalMiddlewareParameters()
-    // {
-    //     $app = new Application;
+    public function testGlobalMiddlewareParameters()
+    {
+        $app = new Application;
 
-    //     $app->middleware(['LumenTestParameterizedMiddleware:foo,bar']);
+        $app->middleware(['MiniTestParameterizedMiddleware:foo,bar']);
 
-    //     $app->router->get('/', function () {
-    //         return response('Hello World');
-    //     });
+        $app->router->get('/', function () {
+            return new TextResponse('Hello World');
+        });
 
-    //     $response = $app->handle(Request::create('/', 'GET'));
+        $response = $app->handle((new ServerRequestFactory)->createServerRequest('GET', '/'));
 
-    //     $this->assertEquals(200, $response->getStatusCode());
-    //     $this->assertEquals('Middleware - foo - bar', $response->getContent());
-    // }
+        $this->assertEquals(200, $response->getStatusCode());
+        $this->assertEquals('Middleware - foo - bar', $response->getBody()->getContents());
+    }
 
-    // public function testRouteMiddlewareParameters()
-    // {
-    //     $app = new Application;
+    public function testRouteMiddlewareParameters()
+    {
+        $app = new Application;
 
-    //     $app->routeMiddleware(['foo' => 'LumenTestParameterizedMiddleware', 'passing' => 'LumenTestPlainMiddleware']);
+        $app->routeMiddleware(['foo' => 'MiniTestParameterizedMiddleware', 'passing' => 'MiniTestPlainMiddleware']);
 
-    //     $app->router->get('/', ['middleware' => 'passing|foo:bar,boom', function () {
-    //         return response('Hello World');
-    //     }]);
+        $app->router->get('/', ['middleware' => 'passing|foo:bar,boom', function () {
+            return new TextResponse('Hello World');
+        }]);
 
-    //     $response = $app->handle(Request::create('/', 'GET'));
+        $response = $app->handle((new ServerRequestFactory)->createServerRequest('GET', '/'));
 
-    //     $this->assertEquals(200, $response->getStatusCode());
-    //     $this->assertEquals('Middleware - bar - boom', $response->getContent());
-    // }
+        $this->assertEquals(200, $response->getStatusCode());
+        $this->assertEquals('Middleware - bar - boom', $response->getBody()->getContents());
+    }
 
-    // public function testWithMiddlewareDisabled()
-    // {
-    //     $app = new Application;
+    public function testWithMiddlewareDisabled()
+    {
+        $app = new Application;
 
-    //     $app->middleware(['LumenTestMiddleware']);
-    //     $app->instance('middleware.disable', true);
+        $app->middleware(['MiniTestMiddleware']);
+        $app->instance('middleware.disable', true);
 
-    //     $app->router->get('/', function () {
-    //         return response('Hello World');
-    //     });
+        $app->router->get('/', function () {
+            return new TextResponse('Hello World');
+        });
 
-    //     $response = $app->handle(Request::create('/', 'GET'));
+        $response = $app->handle((new ServerRequestFactory)->createServerRequest('GET', '/'));
 
-    //     $this->assertEquals(200, $response->getStatusCode());
-    //     $this->assertEquals('Hello World', $response->getContent());
-    // }
+        $this->assertEquals(200, $response->getStatusCode());
+        $this->assertEquals('Hello World', $response->getBody()->getContents());
+    }
 
     // public function testTerminableGlobalMiddleware()
     // {
@@ -463,7 +460,7 @@ class FullApplicationTest extends TestCase
     // public function testBasicControllerDispatchingWithGroup()
     // {
     //     $app = new Application;
-    //     $app->routeMiddleware(['test' => LumenTestMiddleware::class]);
+    //     $app->routeMiddleware(['test' => MiniTestMiddleware::class]);
 
     //     $app->router->group(['middleware' => 'test'], function ($router) {
     //         $router->get('/show/{id}', 'LumenTestController@show');
@@ -478,7 +475,7 @@ class FullApplicationTest extends TestCase
     // public function testBasicControllerDispatchingWithGroupSuffix()
     // {
     //     $app = new Application;
-    //     $app->routeMiddleware(['test' => LumenTestMiddleware::class]);
+    //     $app->routeMiddleware(['test' => MiniTestMiddleware::class]);
 
     //     $app->router->group(['suffix' => '.{format:json|xml}'], function ($router) {
     //         $router->get('/show/{id}', 'LumenTestController@show');
@@ -493,7 +490,7 @@ class FullApplicationTest extends TestCase
     // public function testBasicControllerDispatchingWithGroupAndSuffixWithPath()
     // {
     //     $app = new Application;
-    //     $app->routeMiddleware(['test' => LumenTestMiddleware::class]);
+    //     $app->routeMiddleware(['test' => MiniTestMiddleware::class]);
 
     //     $app->router->group(['suffix' => '/{format:json|xml}'], function ($router) {
     //         $router->get('/show/{id}', 'LumenTestController@show');
@@ -508,7 +505,7 @@ class FullApplicationTest extends TestCase
     // public function testBasicControllerDispatchingWithMiddlewareIntercept()
     // {
     //     $app = new Application;
-    //     $app->routeMiddleware(['test' => LumenTestMiddleware::class]);
+    //     $app->routeMiddleware(['test' => MiniTestMiddleware::class]);
     //     $app->router->get('/show/{id}', 'LumenTestControllerWithMiddleware@show');
 
     //     $response = $app->handle(Request::create('/show/25', 'GET'));
@@ -874,32 +871,32 @@ class FullApplicationTest extends TestCase
 //     }
 // }
 
-class MiniTestMiddleware implements MiddlewareInterface
+class MiniTestMiddleware
 {
-    public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
+    public function handle($request, Closure $next)
     {
         return new TextResponse('Middleware');
     }
 }
 
-// class LumenTestPlainMiddleware
-// {
-//     public function handle($request, $next)
-//     {
-//         $response = $next($request);
-//         $_SERVER['__middleware.response'] = $response instanceof Response;
+class MiniTestPlainMiddleware
+{
+    public function handle($request, $next)
+    {
+        $response = $next($request);
+        $_SERVER['__middleware.response'] = $response instanceof Response;
 
-//         return $response;
-//     }
-// }
+        return $response;
+    }
+}
 
-// class LumenTestParameterizedMiddleware
-// {
-//     public function handle($request, $next, $parameter1, $parameter2)
-//     {
-//         return response("Middleware - $parameter1 - $parameter2");
-//     }
-// }
+class MiniTestParameterizedMiddleware
+{
+    public function handle($request, $next, $parameter1, $parameter2)
+    {
+        return new TextResponse("Middleware - $parameter1 - $parameter2");
+    }
+}
 
 // class LumenTestAction
 // {
