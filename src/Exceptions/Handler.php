@@ -3,21 +3,21 @@
 namespace Mini\Framework\Exceptions;
 
 use Exception;
-use Illuminate\Console\View\Components\BulletList;
-use Illuminate\Console\View\Components\Error;
-use Illuminate\Contracts\Debug\ExceptionHandler;
-use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Throwable;
 use Illuminate\Support\Arr;
-use Illuminate\Validation\ValidationException;
-use Laminas\Diactoros\Exception\ExceptionInterface;
+use Psr\Log\LoggerInterface;
 use Laminas\Diactoros\Response\HtmlResponse;
 use Laminas\Diactoros\Response\JsonResponse;
-use League\Route\Http\Exception\NotFoundException;
-use Psr\Log\LoggerInterface;
+use Illuminate\Console\View\Components\Error;
+use Illuminate\Validation\ValidationException;
+use Illuminate\Contracts\Debug\ExceptionHandler;
+use Illuminate\Console\View\Components\BulletList;
+use Mini\Framework\Exceptions\NotFoundHttpException;
+use Mini\Framework\Exceptions\HttpExceptionInterface;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Symfony\Component\Console\Application as ConsoleApplication;
 use Symfony\Component\Console\Exception\CommandNotFoundException;
 use Symfony\Component\ErrorHandler\ErrorRenderer\HtmlErrorRenderer;
-use Throwable;
 
 class Handler implements ExceptionHandler
 {
@@ -31,7 +31,7 @@ class Handler implements ExceptionHandler
     /**
      * Report or log an exception.
      *
-     * @param \Throwable|ExceptionInterface $e
+     * @param \Throwable|HttpExceptionInterface $e
      *
      * @return void
      *
@@ -61,7 +61,7 @@ class Handler implements ExceptionHandler
     /**
      * Determine if the exception should be reported.
      *
-     * @param \Throwable|ExceptionInterface $e
+     * @param \Throwable|HttpExceptionInterface $e
      *
      * @return bool
      */
@@ -73,7 +73,7 @@ class Handler implements ExceptionHandler
     /**
      * Determine if the exception is in the "do not report" list.
      *
-     * @param \Throwable|ExceptionInterface $e
+     * @param \Throwable|HttpExceptionInterface $e
      *
      * @return bool
      */
@@ -92,11 +92,11 @@ class Handler implements ExceptionHandler
      * Render an exception into an HTTP response.
      *
      * @param \Psr\Http\Message\ServerRequestInterface $request
-     * @param \Throwable|ExceptionInterface            $e
+     * @param \Throwable|HttpExceptionInterface        $e
      *
      * @return \Psr\Http\Message\ResponseInterface
      *
-     * @throws \Throwable|ExceptionInterface
+     * @throws \Throwable|HttpExceptionInterface
      */
     public function render($request, Throwable $e)
     {
@@ -105,7 +105,7 @@ class Handler implements ExceptionHandler
         }
 
         if ($e instanceof ModelNotFoundException) {
-            $e = new NotFoundException($e->getMessage(), $e);
+            $e = new NotFoundHttpException($e->getMessage(), $e);
         } elseif ($e instanceof ValidationException && $e->getResponse()) {
             return $e->getResponse();
         }
@@ -119,7 +119,7 @@ class Handler implements ExceptionHandler
      * Prepare a JSON response for the given exception.
      *
      * @param \Psr\Http\Message\ServerRequestInterface $request
-     * @param \Throwable|ExceptionInterface            $e
+     * @param \Throwable|HttpExceptionInterface        $e
      *
      * @return \Psr\Http\Message\ResponseInterface
      */
@@ -136,7 +136,7 @@ class Handler implements ExceptionHandler
     /**
      * Convert the given exception to an array.
      *
-     * @param \Throwable|ExceptionInterface $e
+     * @param \Throwable|HttpExceptionInterface $e
      *
      * @return array
      */
@@ -159,7 +159,7 @@ class Handler implements ExceptionHandler
      * Prepare a response for the given exception.
      *
      * @param \Psr\Http\Message\ServerRequestInterface $request
-     * @param \Throwable|ExceptionInterface            $e
+     * @param \Throwable|HttpExceptionInterface        $e
      *
      * @return \Psr\Http\Message\ResponseInterface
      */
@@ -179,8 +179,8 @@ class Handler implements ExceptionHandler
     /**
      * Render an exception to a string using Symfony.
      *
-     * @param \Throwable|ExceptionInterface $e
-     * @param bool                          $debug
+     * @param \Throwable|HttpExceptionInterface $e
+     * @param bool                              $debug
      *
      * @return string
      */
@@ -195,7 +195,7 @@ class Handler implements ExceptionHandler
      * Render an exception to the console.
      *
      * @param \Symfony\Component\Console\Output\OutputInterface $output
-     * @param \Throwable|ExceptionInterface                     $e
+     * @param \Throwable|HttpExceptionInterface                     $e
      *
      * @return void
      */
@@ -224,12 +224,12 @@ class Handler implements ExceptionHandler
     /**
      * Determine if the given exception is an HTTP exception.
      *
-     * @param \Throwable|ExceptionInterface $e
+     * @param \Throwable|HttpExceptionInterface $e
      *
      * @return bool
      */
     protected function isHttpException(Throwable $e)
     {
-        return $e instanceof ExceptionInterface;
+        return $e instanceof HttpExceptionInterface;
     }
 }

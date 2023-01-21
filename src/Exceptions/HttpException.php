@@ -2,9 +2,7 @@
 
 namespace Mini\Framework\Exceptions;
 
-use Laminas\Diactoros\Exception\ExceptionInterface;
-
-class HttpException extends \RuntimeException implements ExceptionInterface
+class HttpException extends \RuntimeException implements HttpExceptionInterface
 {
     private $statusCode;
 
@@ -18,11 +16,17 @@ class HttpException extends \RuntimeException implements ExceptionInterface
         parent::__construct($message, $code, $previous);
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function getStatusCode()
     {
         return $this->statusCode;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function getHeaders()
     {
         return $this->headers;

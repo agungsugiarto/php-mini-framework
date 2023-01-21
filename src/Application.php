@@ -676,6 +676,7 @@ class Application extends Container implements RequestHandlerInterface
             \Illuminate\Support\Facades\Queue::class => 'Queue',
             \Illuminate\Support\Facades\Schema::class => 'Schema',
             \Illuminate\Support\Facades\Storage::class => 'Storage',
+            \Illuminate\Support\Facades\URL::class => 'URL',
             \Illuminate\Support\Facades\Validator::class => 'Validator',
         ];
 

@@ -2,10 +2,11 @@
 
 namespace Mini\Framework\Routing;
 
-use Illuminate\Contracts\Routing\UrlRoutable;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Mini\Framework\Application;
+use Psr\Http\Message\ServerRequestInterface;
+use Illuminate\Contracts\Routing\UrlRoutable;
 
 class UrlGenerator
 {
@@ -44,6 +45,13 @@ class UrlGenerator
      */
     protected $cachedSchema;
 
+    /** 
+     * Server request intance.
+     * 
+     * @var ServerRequestInterface
+     */
+    protected $request;
+
     /**
      * Create a new URL redirector instance.
      *
@@ -52,6 +60,8 @@ class UrlGenerator
     public function __construct(Application $app)
     {
         $this->app = $app;
+
+        $this->request = $this->app->make('request');
     }
 
     /**
@@ -61,7 +71,7 @@ class UrlGenerator
      */
     public function full()
     {
-        return $this->app->make('request')->fullUrl();
+        return $this->request->getUri()->__toString();
     }
 
     /**
@@ -71,7 +81,7 @@ class UrlGenerator
      */
     public function current()
     {
-        return $this->to($this->app->make('request')->getPathInfo());
+        return $this->to($this->request->getUri()->getPath());
     }
 
     /**
@@ -216,7 +226,7 @@ class UrlGenerator
         }
 
         if (is_null($this->cachedSchema)) {
-            $this->cachedSchema = $this->forceScheme ?: $this->app->make('request')->getScheme().'://';
+            $this->cachedSchema = $this->forceScheme ?: $this->request->getUri()->getScheme().'://';
         }
 
         return $this->cachedSchema;
@@ -343,7 +353,9 @@ class UrlGenerator
     {
         if (is_null($root)) {
             if (is_null($this->cachedRoot)) {
-                $this->cachedRoot = $this->forcedRoot ?: $this->app->make('request')->root();
+                $this->cachedRoot = $this->forcedRoot ?: rtrim(
+                    $this->request->getUri()->getScheme() . '://' . $this->request->getUri()->getHost(), '/'
+                );
             }
 
             $root = $this->cachedRoot;

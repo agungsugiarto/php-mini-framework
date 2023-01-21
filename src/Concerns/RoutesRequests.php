@@ -88,7 +88,7 @@ trait RoutesRequests
      *
      * @return void
      */
-    public function run($request = null)
+    public function run(?ServerRequestInterface $request = null)
     {
         $request ??= ServerRequestFactory::fromGlobals();
 
