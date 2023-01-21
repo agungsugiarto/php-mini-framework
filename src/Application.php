@@ -2,47 +2,43 @@
 
 namespace Mini\Framework;
 
-use Illuminate\Broadcasting\BroadcastServiceProvider;
-use Illuminate\Bus\BusServiceProvider;
-use Illuminate\Cache\CacheServiceProvider;
-use Illuminate\Config\Repository as ConfigRepository;
-use Illuminate\Container\Container;
-use Illuminate\Contracts\Broadcasting\Broadcaster;
-use Illuminate\Contracts\Broadcasting\Factory;
-use Illuminate\Contracts\Bus\Dispatcher;
-use Illuminate\Database\DatabaseServiceProvider;
-use Illuminate\Database\MigrationServiceProvider;
-use Illuminate\Encryption\EncryptionServiceProvider;
-use Illuminate\Events\EventServiceProvider;
-use Illuminate\Filesystem\Filesystem;
-use Illuminate\Filesystem\FilesystemServiceProvider;
-use Illuminate\Hashing\HashServiceProvider;
+use RuntimeException;
+use Illuminate\Support\Str;
+use Psr\Log\LoggerInterface;
 use Illuminate\Log\LogManager;
-use Illuminate\Pagination\PaginationServiceProvider;
-use Illuminate\Queue\QueueServiceProvider;
 use Illuminate\Support\Composer;
+use Mini\Framework\Routing\Router;
+use Illuminate\Container\Container;
+use Illuminate\Filesystem\Filesystem;
+use Illuminate\Bus\BusServiceProvider;
 use Illuminate\Support\Facades\Facade;
 use Illuminate\Support\ServiceProvider;
-use Illuminate\Support\Str;
-use Illuminate\Translation\TranslationServiceProvider;
-use Illuminate\Validation\ValidationServiceProvider;
+use Illuminate\Contracts\Bus\Dispatcher;
 use Illuminate\View\ViewServiceProvider;
-use Laminas\Diactoros\ServerRequestFactory;
-use Laminas\HttpHandlerRunner\Emitter\SapiEmitter;
-use Mini\Framework\Console\ConsoleServiceProvider;
-use Mini\Framework\Routing\Router;
-use Mini\Framework\Routing\Strategy;
-use Psr\Http\Message\RequestInterface;
-use Psr\Http\Message\ResponseInterface;
-use Psr\Http\Message\ServerRequestInterface;
+use Illuminate\Cache\CacheServiceProvider;
+use Illuminate\Queue\QueueServiceProvider;
+use Illuminate\Events\EventServiceProvider;
+use Illuminate\Hashing\HashServiceProvider;
+use Mini\Framework\Concerns\RoutesRequests;
 use Psr\Http\Server\RequestHandlerInterface;
-use Psr\Log\LoggerInterface;
-use RuntimeException;
-use Throwable;
+use Illuminate\Contracts\Broadcasting\Factory;
+use Illuminate\Database\DatabaseServiceProvider;
+use Illuminate\Database\MigrationServiceProvider;
+use Illuminate\Contracts\Broadcasting\Broadcaster;
+use Mini\Framework\Console\ConsoleServiceProvider;
+use Illuminate\Encryption\EncryptionServiceProvider;
+use Illuminate\Filesystem\FilesystemServiceProvider;
+use Illuminate\Pagination\PaginationServiceProvider;
+use Illuminate\Validation\ValidationServiceProvider;
+use Illuminate\Broadcasting\BroadcastServiceProvider;
+use Illuminate\Config\Repository as ConfigRepository;
+use Illuminate\Translation\TranslationServiceProvider;
+use Mini\Framework\Concerns\RegistersExceptionHandlers;
 
 class Application extends Container implements RequestHandlerInterface
 {
-    use Concerns\RegistersExceptionHandlers;
+    use RoutesRequests;
+    use RegistersExceptionHandlers;
 
     /**
      * Indicates if the class aliases have been registered.
@@ -156,9 +152,7 @@ class Application extends Container implements RequestHandlerInterface
      */
     public function bootstrapRouter()
     {
-        $this->router = (new Router)->setStrategy(
-            (new Strategy)->setContainer($this)
-        );
+        $this->router = new Router($this);
     }
 
     /**
@@ -169,36 +163,6 @@ class Application extends Container implements RequestHandlerInterface
     public function version()
     {
         return 'PHP Mini Framework (v1.0.0-beta.01) (Illuminate Components ^9.21)';
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function handle(ServerRequestInterface $request): ResponseInterface
-    {
-        return $this->router->dispatch($request);
-    }
-
-    /**
-     * Run the application and send the response.
-     *
-     * @return void
-     */
-    public function run(ServerRequestInterface $request = null)
-    {
-        try {
-            $this->boot();
-
-            $request ??= ServerRequestFactory::fromGlobals();
-
-            $this->instance(RequestInterface::class, $request);
-            $this->instance(ServerRequestInterface::class, $request);
-
-            // send the response to the browser
-            (new SapiEmitter)->emit($this->handle($request));
-        } catch (Throwable $e) {
-            (new SapiEmitter)->emit($this->sendExceptionToHandler($e));
-        }
     }
 
     /**
@@ -566,6 +530,18 @@ class Application extends Container implements RequestHandlerInterface
         } else {
             return __DIR__.'/../resources/lang';
         }
+    }
+
+    /**
+     * Register container bindings for the application.
+     *
+     * @return void
+     */
+    protected function registerUrlGeneratorBindings()
+    {
+        $this->singleton('url', function () {
+            return new Routing\UrlGenerator($this);
+        });
     }
 
     /**
@@ -1041,6 +1017,7 @@ class Application extends Container implements RequestHandlerInterface
             'request' => \Psr\Http\Message\ServerRequestInterface::class,
             \Mini\Framework\Routing\Router::class => 'router',
             \Illuminate\Contracts\Translation\Translator::class => 'translator',
+            \Mini\Framework\Routing\UrlGenerator::class => 'url',
             \Illuminate\Contracts\Validation\Factory::class => 'validator',
             \Illuminate\Contracts\View\Factory::class => 'view',
         ];
@@ -1084,6 +1061,7 @@ class Application extends Container implements RequestHandlerInterface
         \Illuminate\Contracts\Queue\Queue::class => 'registerQueueBindings',
         'router' => 'registerRouterBindings',
         'translator' => 'registerTranslationBindings',
+        'url' => 'registerUrlGeneratorBindings',
         'validator' => 'registerValidatorBindings',
         \Illuminate\Contracts\Validation\Factory::class => 'registerValidatorBindings',
         'view' => 'registerViewBindings',
