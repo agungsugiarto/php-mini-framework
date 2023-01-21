@@ -128,7 +128,7 @@ trait RoutesRequests
     }
 
     /**
-     * Dispatch the incoming request.
+     * {@inheritdoc}
      */
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
