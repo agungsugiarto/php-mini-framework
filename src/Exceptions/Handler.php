@@ -3,21 +3,19 @@
 namespace Mini\Framework\Exceptions;
 
 use Exception;
-use Throwable;
+use Illuminate\Console\View\Components\BulletList;
+use Illuminate\Console\View\Components\Error;
+use Illuminate\Contracts\Debug\ExceptionHandler;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Arr;
-use Psr\Log\LoggerInterface;
+use Illuminate\Validation\ValidationException;
 use Laminas\Diactoros\Response\HtmlResponse;
 use Laminas\Diactoros\Response\JsonResponse;
-use Illuminate\Console\View\Components\Error;
-use Illuminate\Validation\ValidationException;
-use Illuminate\Contracts\Debug\ExceptionHandler;
-use Illuminate\Console\View\Components\BulletList;
-use Mini\Framework\Exceptions\NotFoundHttpException;
-use Mini\Framework\Exceptions\HttpExceptionInterface;
-use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Application as ConsoleApplication;
 use Symfony\Component\Console\Exception\CommandNotFoundException;
 use Symfony\Component\ErrorHandler\ErrorRenderer\HtmlErrorRenderer;
+use Throwable;
 
 class Handler implements ExceptionHandler
 {
@@ -195,7 +193,7 @@ class Handler implements ExceptionHandler
      * Render an exception to the console.
      *
      * @param \Symfony\Component\Console\Output\OutputInterface $output
-     * @param \Throwable|HttpExceptionInterface                     $e
+     * @param \Throwable|HttpExceptionInterface                 $e
      *
      * @return void
      */

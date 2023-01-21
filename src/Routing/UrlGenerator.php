@@ -2,11 +2,11 @@
 
 namespace Mini\Framework\Routing;
 
+use Illuminate\Contracts\Routing\UrlRoutable;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Mini\Framework\Application;
 use Psr\Http\Message\ServerRequestInterface;
-use Illuminate\Contracts\Routing\UrlRoutable;
 
 class UrlGenerator
 {
@@ -45,9 +45,9 @@ class UrlGenerator
      */
     protected $cachedSchema;
 
-    /** 
+    /**
      * Server request intance.
-     * 
+     *
      * @var ServerRequestInterface
      */
     protected $request;
@@ -354,7 +354,7 @@ class UrlGenerator
         if (is_null($root)) {
             if (is_null($this->cachedRoot)) {
                 $this->cachedRoot = $this->forcedRoot ?: rtrim(
-                    $this->request->getUri()->getScheme() . '://' . $this->request->getUri()->getHost(), '/'
+                    $this->request->getUri()->getScheme().'://'.$this->request->getUri()->getHost(), '/'
                 );
             }
 
