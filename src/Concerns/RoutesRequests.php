@@ -15,6 +15,7 @@ use Mini\Framework\Exceptions\MethodNotAllowedHttpException;
 use Mini\Framework\Exceptions\NotFoundHttpException;
 use Mini\Framework\Routing\Controller;
 use Mini\Framework\Routing\Pipeline;
+use Mini\Framework\Routing\RoutingClosure;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -260,7 +261,7 @@ trait RoutesRequests
 
         foreach ($action as $value) {
             if ($value instanceof Closure) {
-                $callable = $value->bindTo($this);
+                $callable = $value->bindTo(new RoutingClosure);
                 break;
             }
 
