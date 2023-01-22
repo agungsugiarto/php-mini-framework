@@ -70,7 +70,7 @@ trait ProvidesConvenienceMethods
             $this->throwValidationException($request, $validator);
         }
 
-        return $this->extractInputFromRules($rules);
+        return $this->extractInputFromRules($request, $rules);
     }
 
     /**
@@ -78,11 +78,15 @@ trait ProvidesConvenienceMethods
      *
      * @return array
      */
-    protected function extractInputFromRules(array $rules)
+    protected function extractInputFromRules(ServerRequestInterface $request, array $rules)
     {
-        return collect($rules)->keys()->map(function ($rule) {
+        return collect(array_merge(
+            $request->getQueryParams(),
+            $request->getParsedBody(),
+            $request->getUploadedFiles()
+        ))->only(collect($rules)->keys()->map(function ($rule) {
             return Str::contains($rule, '.') ? explode('.', $rule)[0] : $rule;
-        })->unique()->toArray();
+        })->unique()->toArray());
     }
 
     /**
