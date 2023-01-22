@@ -1,13 +1,17 @@
 <?php
 
 use Illuminate\Container\Container;
-use Illuminate\Contracts\Broadcasting\Factory as BroadcastFactory;
+use Laminas\Diactoros\UploadedFile;
+use Mini\Framework\Bus\PendingDispatch;
 use Illuminate\Contracts\Bus\Dispatcher;
+use Psr\Http\Message\UploadedFileInterface;
 use Illuminate\Contracts\Debug\ExceptionHandler;
 use Laminas\Diactoros\Response\RedirectResponse;
-use Mini\Framework\Bus\PendingDispatch;
+use Laminas\Diactoros\Exception\InvalidArgumentException;
+use Illuminate\Contracts\Broadcasting\Factory as BroadcastFactory;
+use Laminas\Diactoros\Exception\UnrecognizedProtocolVersionException;
 
-if (! function_exists('abort')) {
+if (!function_exists('abort')) {
     /**
      * Throw an HttpException with the given data.
      *
@@ -25,7 +29,7 @@ if (! function_exists('abort')) {
     }
 }
 
-if (! function_exists('app')) {
+if (!function_exists('app')) {
     /**
      * Get the available container instance.
      *
@@ -43,7 +47,7 @@ if (! function_exists('app')) {
     }
 }
 
-if (! function_exists('base_path')) {
+if (!function_exists('base_path')) {
     /**
      * Get the path to the base of the install.
      *
@@ -53,11 +57,11 @@ if (! function_exists('base_path')) {
      */
     function base_path($path = '')
     {
-        return app()->basePath().($path ? '/'.$path : $path);
+        return app()->basePath() . ($path ? '/' . $path : $path);
     }
 }
 
-if (! function_exists('broadcast')) {
+if (!function_exists('broadcast')) {
     /**
      * Begin broadcasting an event.
      *
@@ -71,7 +75,7 @@ if (! function_exists('broadcast')) {
     }
 }
 
-if (! function_exists('decrypt')) {
+if (!function_exists('decrypt')) {
     /**
      * Decrypt the given value.
      *
@@ -85,7 +89,7 @@ if (! function_exists('decrypt')) {
     }
 }
 
-if (! function_exists('dispatch')) {
+if (!function_exists('dispatch')) {
     /**
      * Dispatch a job to its appropriate handler.
      *
@@ -99,7 +103,7 @@ if (! function_exists('dispatch')) {
     }
 }
 
-if (! function_exists('dispatch_now')) {
+if (!function_exists('dispatch_now')) {
     /**
      * Dispatch a command to its appropriate handler in the current process.
      *
@@ -114,7 +118,7 @@ if (! function_exists('dispatch_now')) {
     }
 }
 
-if (! function_exists('config')) {
+if (!function_exists('config')) {
     /**
      * Get / set the specified configuration value.
      *
@@ -139,7 +143,7 @@ if (! function_exists('config')) {
     }
 }
 
-if (! function_exists('database_path')) {
+if (!function_exists('database_path')) {
     /**
      * Get the path to the database directory of the install.
      *
@@ -153,7 +157,7 @@ if (! function_exists('database_path')) {
     }
 }
 
-if (! function_exists('encrypt')) {
+if (!function_exists('encrypt')) {
     /**
      * Encrypt the given value.
      *
@@ -167,7 +171,7 @@ if (! function_exists('encrypt')) {
     }
 }
 
-if (! function_exists('event')) {
+if (!function_exists('event')) {
     /**
      * Dispatch an event and call the listeners.
      *
@@ -183,7 +187,7 @@ if (! function_exists('event')) {
     }
 }
 
-if (! function_exists('info')) {
+if (!function_exists('info')) {
     /**
      * Write some information to the log.
      *
@@ -198,7 +202,7 @@ if (! function_exists('info')) {
     }
 }
 
-if (! function_exists('redirect')) {
+if (!function_exists('redirect')) {
     /**
      * Get an instance of the redirector.
      *
@@ -214,7 +218,7 @@ if (! function_exists('redirect')) {
     }
 }
 
-if (! function_exists('report')) {
+if (!function_exists('report')) {
     /**
      * Report an exception.
      *
@@ -228,7 +232,7 @@ if (! function_exists('report')) {
     }
 }
 
-if (! function_exists('resource_path')) {
+if (!function_exists('resource_path')) {
     /**
      * Get the path to the resources folder.
      *
@@ -242,7 +246,7 @@ if (! function_exists('resource_path')) {
     }
 }
 
-if (! function_exists('storage_path')) {
+if (!function_exists('storage_path')) {
     /**
      * Get the path to the storage folder.
      *
@@ -256,7 +260,7 @@ if (! function_exists('storage_path')) {
     }
 }
 
-if (! function_exists('trans')) {
+if (!function_exists('trans')) {
     /**
      * Translate the given message.
      *
@@ -276,7 +280,7 @@ if (! function_exists('trans')) {
     }
 }
 
-if (! function_exists('__')) {
+if (!function_exists('__')) {
     /**
      * Translate the given message.
      *
@@ -292,7 +296,7 @@ if (! function_exists('__')) {
     }
 }
 
-if (! function_exists('trans_choice')) {
+if (!function_exists('trans_choice')) {
     /**
      * Translates the given message based on a count.
      *
@@ -308,7 +312,7 @@ if (! function_exists('trans_choice')) {
     }
 }
 
-if (! function_exists('validator')) {
+if (!function_exists('validator')) {
     /**
      * Create a new Validator instance.
      *
@@ -326,7 +330,7 @@ if (! function_exists('validator')) {
     }
 }
 
-if (! function_exists('view')) {
+if (!function_exists('view')) {
     /**
      * Get the evaluated view contents for the given view.
      *
@@ -345,5 +349,320 @@ if (! function_exists('view')) {
         }
 
         return $factory->make($view, $data, $mergeData);
+    }
+}
+
+if (!function_exists('normalizeServer')) {
+    /**
+     * Marshal the $_SERVER array
+     *
+     * Pre-processes and returns the $_SERVER superglobal. In particularly, it
+     * attempts to detect the Authorization header, which is often not aggregated
+     * correctly under various SAPI/httpd combinations.
+     *
+     * @param null|callable $apacheRequestHeaderCallback Callback that can be used to
+     *     retrieve Apache request headers. This defaults to
+     *     `apache_request_headers` under the Apache mod_php.
+     * @return array Either $server verbatim, or with an added HTTP_AUTHORIZATION header.
+     */
+    function normalizeServer(array $server, ?callable $apacheRequestHeaderCallback = null): array
+    {
+        if (null === $apacheRequestHeaderCallback && is_callable('apache_request_headers')) {
+            $apacheRequestHeaderCallback = 'apache_request_headers';
+        }
+
+        // If the HTTP_AUTHORIZATION value is already set, or the callback is not
+        // callable, we return verbatim
+        if (
+            isset($server['HTTP_AUTHORIZATION'])
+            || !is_callable($apacheRequestHeaderCallback)
+        ) {
+            return $server;
+        }
+
+        $apacheRequestHeaders = $apacheRequestHeaderCallback();
+        if (isset($apacheRequestHeaders['Authorization'])) {
+            $server['HTTP_AUTHORIZATION'] = $apacheRequestHeaders['Authorization'];
+            return $server;
+        }
+
+        if (isset($apacheRequestHeaders['authorization'])) {
+            $server['HTTP_AUTHORIZATION'] = $apacheRequestHeaders['authorization'];
+            return $server;
+        }
+
+        return $server;
+    }
+}
+
+if (!function_exists('normalizeUploadedFiles')) {
+    /**
+     * Normalize uploaded files
+     *
+     * Transforms each value into an UploadedFile instance, and ensures that nested
+     * arrays are normalized.
+     *
+     * @return UploadedFileInterface[]
+     * @throws InvalidArgumentException For unrecognized values.
+     */
+    function normalizeUploadedFiles(array $files): array
+    {
+        /**
+         * Traverse a nested tree of uploaded file specifications.
+         *
+         * @param string[]|array[] $tmpNameTree
+         * @param int[]|array[] $sizeTree
+         * @param int[]|array[] $errorTree
+         * @param string[]|array[]|null $nameTree
+         * @param string[]|array[]|null $typeTree
+         * @return UploadedFile[]|array[]
+         */
+        $recursiveNormalize = static function (
+            array $tmpNameTree,
+            array $sizeTree,
+            array $errorTree,
+            ?array $nameTree = null,
+            ?array $typeTree = null
+        ) use (&$recursiveNormalize): array {
+            $normalized = [];
+            foreach ($tmpNameTree as $key => $value) {
+                if (is_array($value)) {
+                    // Traverse
+                    $normalized[$key] = $recursiveNormalize(
+                        $tmpNameTree[$key],
+                        $sizeTree[$key],
+                        $errorTree[$key],
+                        $nameTree[$key] ?? null,
+                        $typeTree[$key] ?? null
+                    );
+                    continue;
+                }
+                $normalized[$key] = createUploadedFile([
+                    'tmp_name' => $tmpNameTree[$key],
+                    'size'     => $sizeTree[$key],
+                    'error'    => $errorTree[$key],
+                    'name'     => $nameTree[$key] ?? null,
+                    'type'     => $typeTree[$key] ?? null,
+                ]);
+            }
+            return $normalized;
+        };
+
+        /**
+         * Normalize an array of file specifications.
+         *
+         * Loops through all nested files (as determined by receiving an array to the
+         * `tmp_name` key of a `$_FILES` specification) and returns a normalized array
+         * of UploadedFile instances.
+         *
+         * This function normalizes a `$_FILES` array representing a nested set of
+         * uploaded files as produced by the php-fpm SAPI, CGI SAPI, or mod_php
+         * SAPI.
+         *
+         * @param array $files
+         * @return UploadedFile[]
+         */
+        $normalizeUploadedFileSpecification = static function (array $files = []) use (&$recursiveNormalize): array {
+            if (
+                !isset($files['tmp_name']) || !is_array($files['tmp_name'])
+                || !isset($files['size']) || !is_array($files['size'])
+                || !isset($files['error']) || !is_array($files['error'])
+            ) {
+                throw new InvalidArgumentException(sprintf(
+                    '$files provided to %s MUST contain each of the keys "tmp_name",'
+                        . ' "size", and "error", with each represented as an array;'
+                        . ' one or more were missing or non-array values',
+                    __FUNCTION__
+                ));
+            }
+
+            return $recursiveNormalize(
+                $files['tmp_name'],
+                $files['size'],
+                $files['error'],
+                $files['name'] ?? null,
+                $files['type'] ?? null
+            );
+        };
+
+        $normalized = [];
+        foreach ($files as $key => $value) {
+            if ($value instanceof UploadedFileInterface) {
+                $normalized[$key] = $value;
+                continue;
+            }
+
+            if (is_array($value) && isset($value['tmp_name']) && is_array($value['tmp_name'])) {
+                $normalized[$key] = $normalizeUploadedFileSpecification($value);
+                continue;
+            }
+
+            if (is_array($value) && isset($value['tmp_name'])) {
+                $normalized[$key] = createUploadedFile($value);
+                continue;
+            }
+
+            if (is_array($value)) {
+                $normalized[$key] = normalizeUploadedFiles($value);
+                continue;
+            }
+
+            throw new InvalidArgumentException('Invalid value in files specification');
+        }
+        return $normalized;
+    }
+}
+
+if (!function_exists('createUploadedFile')) {
+    /**
+     * Create an uploaded file instance from an array of values.
+     *
+     * @param array $spec A single $_FILES entry.
+     * @throws InvalidArgumentException If one or more of the tmp_name,
+     *     size, or error keys are missing from $spec.
+     */
+    function createUploadedFile(array $spec): UploadedFile
+    {
+        if (
+            !isset($spec['tmp_name'])
+            || !isset($spec['size'])
+            || !isset($spec['error'])
+        ) {
+            throw new InvalidArgumentException(sprintf(
+                '$spec provided to %s MUST contain each of the keys "tmp_name",'
+                    . ' "size", and "error"; one or more were missing',
+                __FUNCTION__
+            ));
+        }
+
+        return new UploadedFile(
+            $spec['tmp_name'],
+            (int) $spec['size'],
+            $spec['error'],
+            $spec['name'] ?? null,
+            $spec['type'] ?? null
+        );
+    }
+}
+
+if (!function_exists('marshalHeadersFromSapi')) {
+    /**
+     * @param array $server Values obtained from the SAPI (generally `$_SERVER`).
+     * @return array Header/value pairs
+     */
+    function marshalHeadersFromSapi(array $server): array
+    {
+        $contentHeaderLookup = isset($server['LAMINAS_DIACTOROS_STRICT_CONTENT_HEADER_LOOKUP'])
+            ? static function (string $key): bool {
+                static $contentHeaders = [
+                    'CONTENT_TYPE'   => true,
+                    'CONTENT_LENGTH' => true,
+                    'CONTENT_MD5'    => true,
+                ];
+                return isset($contentHeaders[$key]);
+            }
+            : static fn (string $key): bool => str_starts_with($key, 'CONTENT_');
+
+        $headers = [];
+        foreach ($server as $key => $value) {
+            if (!is_string($key)) {
+                continue;
+            }
+
+            if ($value === '') {
+                continue;
+            }
+
+            // Apache prefixes environment variables with REDIRECT_
+            // if they are added by rewrite rules
+            if (str_starts_with($key, 'REDIRECT_')) {
+                $key = substr($key, 9);
+
+                // We will not overwrite existing variables with the
+                // prefixed versions, though
+                if (array_key_exists($key, $server)) {
+                    continue;
+                }
+            }
+
+            if (str_starts_with($key, 'HTTP_')) {
+                $name           = strtr(strtolower(substr($key, 5)), '_', '-');
+                $headers[$name] = $value;
+                continue;
+            }
+
+            if ($contentHeaderLookup($key)) {
+                $name           = strtr(strtolower($key), '_', '-');
+                $headers[$name] = $value;
+                continue;
+            }
+        }
+
+        return $headers;
+    }
+}
+
+if (!function_exists('parseCookieHeader')) {
+    /**
+     * Parse a cookie header according to RFC 6265.
+     *
+     * PHP will replace special characters in cookie names, which results in other cookies not being available due to
+     * overwriting. Thus, the server request should take the cookies from the request header instead.
+     *
+     * @param string $cookieHeader A string cookie header value.
+     * @return array<non-empty-string, string> key/value cookie pairs.
+     */
+    function parseCookieHeader($cookieHeader): array
+    {
+        preg_match_all('(
+            (?:^\\n?[ \t]*|;[ ])
+            (?P<name>[!#$%&\'*+-.0-9A-Z^_`a-z|~]+)
+            =
+            (?P<DQUOTE>"?)
+                (?P<value>[\x21\x23-\x2b\x2d-\x3a\x3c-\x5b\x5d-\x7e]*)
+            (?P=DQUOTE)
+            (?=\\n?[ \t]*$|;[ ])
+        )x', $cookieHeader, $matches, PREG_SET_ORDER);
+
+        $cookies = [];
+
+        foreach ($matches as $match) {
+            $cookies[$match['name']] = urldecode($match['value']);
+        }
+
+        return $cookies;
+    }
+}
+
+if (!function_exists('marshalMethodFromSapi')) {
+    /**
+     * Retrieve the request method from the SAPI parameters.
+     */
+    function marshalMethodFromSapi(array $server): string
+    {
+        return $server['REQUEST_METHOD'] ?? 'GET';
+    }
+}
+
+if (!function_exists('marshalProtocolVersionFromSapi')) {
+    /**
+     * Return HTTP protocol version (X.Y) as discovered within a `$_SERVER` array.
+     *
+     * @throws UnrecognizedProtocolVersionException If the
+     *     $server['SERVER_PROTOCOL'] value is malformed.
+     */
+    function marshalProtocolVersionFromSapi(array $server): string
+    {
+        if (!isset($server['SERVER_PROTOCOL'])) {
+            return '1.1';
+        }
+
+        if (!preg_match('#^(HTTP/)?(?P<version>[1-9]\d*(?:\.\d)?)$#', $server['SERVER_PROTOCOL'], $matches)) {
+            throw UnrecognizedProtocolVersionException::forVersion(
+                (string) $server['SERVER_PROTOCOL']
+            );
+        }
+
+        return $matches['version'];
     }
 }

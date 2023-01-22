@@ -2,16 +2,16 @@
 
 namespace Mini\Framework\Console;
 
-use Illuminate\Console\Application as Artisan;
-use Illuminate\Console\Scheduling\Schedule;
-use Illuminate\Console\Scheduling\ScheduleRunCommand;
-use Illuminate\Contracts\Console\Kernel as KernelContract;
-use Illuminate\Contracts\Debug\ExceptionHandler;
-use Laminas\Diactoros\ServerRequestFactory;
+use Throwable;
+use RuntimeException;
 use Mini\Framework\Application;
 use Mini\Framework\Exceptions\Handler;
-use RuntimeException;
-use Throwable;
+use Illuminate\Console\Scheduling\Schedule;
+use Mini\Framework\Http\ServerRequestFactory;
+use Illuminate\Console\Application as Artisan;
+use Illuminate\Contracts\Debug\ExceptionHandler;
+use Illuminate\Console\Scheduling\ScheduleRunCommand;
+use Illuminate\Contracts\Console\Kernel as KernelContract;
 
 class Kernel implements KernelContract
 {

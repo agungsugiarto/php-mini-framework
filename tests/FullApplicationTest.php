@@ -1,12 +1,14 @@
 <?php
 
-use Laminas\Diactoros\Response;
 use Mockery as m;
+use Laminas\Diactoros\Response;
 use Mini\Framework\Application;
 use PHPUnit\Framework\TestCase;
-use Laminas\Diactoros\ServerRequestFactory;
+use Psr\Http\Message\ResponseInterface;
 use Laminas\Diactoros\Response\TextResponse;
+use Laminas\Diactoros\StreamFactory;
 use Psr\Http\Message\ServerRequestInterface;
+use Mini\Framework\Http\ServerRequestFactory;
 class FullApplicationTest extends TestCase
 {
     protected function tearDown(): void
