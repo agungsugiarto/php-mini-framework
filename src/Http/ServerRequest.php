@@ -19,7 +19,8 @@ class ServerRequest extends BaseServerRequest
     /**
      * Determine if the route name matches a given pattern.
      *
-     * @param  mixed  $patterns
+     * @param mixed $patterns
+     *
      * @return bool
      */
     public function routeIs(...$patterns)
@@ -40,8 +41,9 @@ class ServerRequest extends BaseServerRequest
     /**
      * Get the route handling the request.
      *
-     * @param  string|null  $param
-     * @param  mixed  $default
+     * @param string|null $param
+     * @param mixed       $default
+     *
      * @return array|string
      */
     public function route($param = null, $default = null)
@@ -70,7 +72,6 @@ class ServerRequest extends BaseServerRequest
     /**
      * Set the route resolver callback.
      *
-     * @param  \Closure  $callback
      * @return $this
      */
     public function setRouteResolver(Closure $callback)

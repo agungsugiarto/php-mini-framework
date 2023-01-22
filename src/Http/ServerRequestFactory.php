@@ -2,12 +2,11 @@
 
 namespace Mini\Framework\Http;
 
-use Laminas\Diactoros\UriFactory;
-use Mini\Framework\Http\ServerRequest;
-use Psr\Http\Message\ServerRequestInterface;
-use Psr\Http\Message\ServerRequestFactoryInterface;
 use Laminas\Diactoros\ServerRequestFilter\FilterServerRequestInterface;
 use Laminas\Diactoros\ServerRequestFilter\FilterUsingXForwardedHeaders;
+use Laminas\Diactoros\UriFactory;
+use Psr\Http\Message\ServerRequestFactoryInterface;
+use Psr\Http\Message\ServerRequestInterface;
 
 class ServerRequestFactory implements ServerRequestFactoryInterface
 {
@@ -29,16 +28,16 @@ class ServerRequestFactory implements ServerRequestFactoryInterface
      *
      * @see fromServer()
      *
-     * @param array $server $_SERVER superglobal
-     * @param array $query $_GET superglobal
-     * @param array $body $_POST superglobal
-     * @param array $cookies $_COOKIE superglobal
-     * @param array $files $_FILES superglobal
-     * @param null|FilterServerRequestInterface $requestFilter If present, the
-     *     generated request will be passed to this instance and the result
-     *     returned by this method. When not present, a default instance of
-     *     FilterUsingXForwardedHeaders is created, using the `trustReservedSubnets()`
-     *     constructor.
+     * @param array                             $server        $_SERVER superglobal
+     * @param array                             $query         $_GET superglobal
+     * @param array                             $body          $_POST superglobal
+     * @param array                             $cookies       $_COOKIE superglobal
+     * @param array                             $files         $_FILES superglobal
+     * @param FilterServerRequestInterface|null $requestFilter If present, the
+     *                                                         generated request will be passed to this instance and the result
+     *                                                         returned by this method. When not present, a default instance of
+     *                                                         FilterUsingXForwardedHeaders is created, using the `trustReservedSubnets()`
+     *                                                         constructor.
      */
     public static function fromGlobals(
         ?array $server = null,
@@ -50,11 +49,11 @@ class ServerRequestFactory implements ServerRequestFactoryInterface
     ): ServerRequest {
         $requestFilter = $requestFilter ?: FilterUsingXForwardedHeaders::trustReservedSubnets();
 
-        $server  = normalizeServer(
+        $server = normalizeServer(
             $server ?: $_SERVER,
             is_callable(self::$apacheRequestHeaders) ? self::$apacheRequestHeaders : null
         );
-        $files   = normalizeUploadedFiles($files ?: $_FILES);
+        $files = normalizeUploadedFiles($files ?: $_FILES);
         $headers = marshalHeadersFromSapi($server);
 
         if (null === $cookies && array_key_exists('cookie', $headers)) {

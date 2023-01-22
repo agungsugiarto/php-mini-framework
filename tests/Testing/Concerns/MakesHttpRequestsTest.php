@@ -1,10 +1,10 @@
 <?php
 
+use Laminas\Diactoros\Response\JsonResponse;
 use Mini\Framework\Application;
 use Mini\Framework\Http\Request;
-use PHPUnit\Framework\TestCase;
-use Laminas\Diactoros\Response\JsonResponse;
 use Mini\Framework\Testing\Concerns\MakesHttpRequests;
+use PHPUnit\Framework\TestCase;
 
 class MakesHttpRequestsTest extends TestCase
 {

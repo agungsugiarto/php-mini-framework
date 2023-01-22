@@ -3,24 +3,24 @@
 namespace Mini\Framework\Concerns;
 
 use Closure;
-use Throwable;
-use RuntimeException;
 use FastRoute\Dispatcher;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
-use Laminas\Diactoros\StreamFactory;
-use Mini\Framework\Routing\Pipeline;
 use Laminas\Diactoros\ResponseFactory;
-use Mini\Framework\Routing\Controller;
-use Psr\Http\Message\RequestInterface;
-use Psr\Http\Message\ResponseInterface;
-use Mini\Framework\Routing\RoutingClosure;
-use Psr\Http\Message\ServerRequestInterface;
+use Laminas\Diactoros\StreamFactory;
 use Laminas\HttpHandlerRunner\Emitter\SapiEmitter;
 use Mini\Framework\Exceptions\HttpResponseException;
-use Mini\Framework\Exceptions\NotFoundHttpException;
 use Mini\Framework\Exceptions\MethodNotAllowedHttpException;
+use Mini\Framework\Exceptions\NotFoundHttpException;
 use Mini\Framework\Http\ServerRequestFactory;
+use Mini\Framework\Routing\Controller;
+use Mini\Framework\Routing\Pipeline;
+use Mini\Framework\Routing\RoutingClosure;
+use Psr\Http\Message\RequestInterface;
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
+use RuntimeException;
+use Throwable;
 
 trait RoutesRequests
 {
@@ -157,8 +157,6 @@ trait RoutesRequests
 
     /**
      * Parse the incoming request and return the method and path info.
-     *
-     * @param \Psr\Http\Message\ServerRequestInterface $request
      *
      * @return array
      */
