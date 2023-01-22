@@ -3,12 +3,12 @@
 namespace Mini\Framework\Routing;
 
 use Closure;
-use Illuminate\Support\Str;
-use Illuminate\Validation\Validator;
 use Illuminate\Contracts\Bus\Dispatcher;
+use Illuminate\Support\Str;
+use Illuminate\Validation\ValidationException;
+use Illuminate\Validation\Validator;
 use Laminas\Diactoros\Response\JsonResponse;
 use Psr\Http\Message\ServerRequestInterface;
-use Illuminate\Validation\ValidationException;
 
 trait ProvidesConvenienceMethods
 {
@@ -29,7 +29,6 @@ trait ProvidesConvenienceMethods
     /**
      * Set the response builder callback.
      *
-     * @param  \Closure  $callback
      * @return void
      */
     public static function buildResponseUsing(Closure $callback)
@@ -40,7 +39,6 @@ trait ProvidesConvenienceMethods
     /**
      * Set the error formatter callback.
      *
-     * @param  \Closure  $callback
      * @return void
      */
     public static function formatErrorsUsing(Closure $callback)
@@ -51,10 +49,6 @@ trait ProvidesConvenienceMethods
     /**
      * Validate the given request with the given rules.
      *
-     * @param  \Psr\Http\Message\ServerRequestInterface  $request
-     * @param  array  $rules
-     * @param  array  $messages
-     * @param  array  $customAttributes
      * @return array
      *
      * @throws \Illuminate\Validation\ValidationException
@@ -82,7 +76,6 @@ trait ProvidesConvenienceMethods
     /**
      * Get the request input based on the given validation rules.
      *
-     * @param  array  $rules
      * @return array
      */
     protected function extractInputFromRules(array $rules)
@@ -95,8 +88,8 @@ trait ProvidesConvenienceMethods
     /**
      * Throw the failed validation exception.
      *
-     * @param  \Psr\Http\Message\ServerRequestInterface  $request
-     * @param  \Illuminate\Contracts\Validation\Validator  $validator
+     * @param \Illuminate\Contracts\Validation\Validator $validator
+     *
      * @return void
      *
      * @throws \Illuminate\Validation\ValidationException
@@ -111,8 +104,6 @@ trait ProvidesConvenienceMethods
     /**
      * Build a response based on the given errors.
      *
-     * @param  \Psr\Http\Message\ServerRequestInterface  $request
-     * @param  array  $errors
      * @return \Laminas\Diactoros\Response\JsonResponse|mixed
      */
     protected function buildFailedValidationResponse(ServerRequestInterface $request, array $errors)
@@ -127,7 +118,6 @@ trait ProvidesConvenienceMethods
     /**
      * Format validation errors.
      *
-     * @param  \Illuminate\Validation\Validator  $validator
      * @return array|mixed
      */
     protected function formatValidationErrors(Validator $validator)
@@ -139,11 +129,11 @@ trait ProvidesConvenienceMethods
         return $validator->errors()->getMessages();
     }
 
-
     /**
      * Dispatch a job to its appropriate handler.
      *
-     * @param  mixed  $job
+     * @param mixed $job
+     *
      * @return mixed
      */
     public function dispatch($job)
@@ -154,8 +144,9 @@ trait ProvidesConvenienceMethods
     /**
      * Dispatch a command to its appropriate handler in the current process.
      *
-     * @param  mixed  $job
-     * @param  mixed  $handler
+     * @param mixed $job
+     * @param mixed $handler
+     *
      * @return mixed
      */
     public function dispatchNow($job, $handler = null)

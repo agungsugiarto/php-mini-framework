@@ -2,8 +2,6 @@
 
 namespace Mini\Framework\Routing;
 
-use Mini\Framework\Routing\ProvidesConvenienceMethods;
-
 class Controller
 {
     use ProvidesConvenienceMethods;
