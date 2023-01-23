@@ -2,16 +2,16 @@
 
 namespace Mini\Framework\Concerns;
 
-use Exception;
-use Throwable;
 use ErrorException;
+use Exception;
+use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Log\LogManager;
 use Mini\Framework\Exceptions\Handler;
 use Mini\Framework\Exceptions\HttpException;
 use Mini\Framework\Exceptions\NotFoundHttpException;
-use Illuminate\Contracts\Debug\ExceptionHandler;
 use Symfony\Component\Console\Output\ConsoleOutput;
 use Symfony\Component\ErrorHandler\Error\FatalError;
+use Throwable;
 
 trait RegistersExceptionHandlers
 {
