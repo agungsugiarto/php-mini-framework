@@ -3,24 +3,32 @@
 namespace Mini\Framework\Concerns;
 
 use Closure;
+use stdClass;
+use Throwable;
+use ArrayObject;
+use JsonSerializable;
+use RuntimeException;
 use FastRoute\Dispatcher;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
-use Laminas\Diactoros\ResponseFactory;
+use Illuminate\Support\Stringable;
 use Laminas\Diactoros\StreamFactory;
+use Mini\Framework\Routing\Pipeline;
+use Laminas\Diactoros\ResponseFactory;
+use Mini\Framework\Routing\Controller;
+use Psr\Http\Message\RequestInterface;
+use Illuminate\Database\Eloquent\Model;
+use Psr\Http\Message\ResponseInterface;
+use Illuminate\Contracts\Support\Jsonable;
+use Mini\Framework\Routing\RoutingClosure;
+use Illuminate\Contracts\Support\Arrayable;
+use Laminas\Diactoros\Response\JsonResponse;
+use Psr\Http\Message\ServerRequestInterface;
+use Mini\Framework\Http\ServerRequestFactory;
 use Laminas\HttpHandlerRunner\Emitter\SapiEmitter;
 use Mini\Framework\Exceptions\HttpResponseException;
-use Mini\Framework\Exceptions\MethodNotAllowedHttpException;
 use Mini\Framework\Exceptions\NotFoundHttpException;
-use Mini\Framework\Http\ServerRequestFactory;
-use Mini\Framework\Routing\Controller;
-use Mini\Framework\Routing\Pipeline;
-use Mini\Framework\Routing\RoutingClosure;
-use Psr\Http\Message\RequestInterface;
-use Psr\Http\Message\ResponseInterface;
-use Psr\Http\Message\ServerRequestInterface;
-use RuntimeException;
-use Throwable;
+use Mini\Framework\Exceptions\MethodNotAllowedHttpException;
 
 trait RoutesRequests
 {
@@ -356,7 +364,7 @@ trait RoutesRequests
     /**
      * Call a controller callable and return the response.
      *
-     * @return \Illuminate\Http\Response
+     * @return \Psr\Http\Message\ResponseInterface
      */
     protected function callControllerCallable(callable $callable, array $parameters = [])
     {
@@ -407,18 +415,31 @@ trait RoutesRequests
     /**
      * Prepare the response for sending.
      *
-     * @param mixed $response
+     * @param mixed|ResponseInterface $response
      *
-     * @return \Psr\Http\Message\ResponseInterface
+     * @return ResponseInterface
      */
     public function prepareResponse($response)
     {
-        if ($response instanceof ResponseInterface) {
-            return $response;
+        if ($response instanceof Model) {
+            $response = new JsonResponse($response, 201);
+        } elseif ($response instanceof Stringable) {
+            $response = (new ResponseFactory)->createResponse()
+                ->withBody((new StreamFactory)->createStream($response->__toString()));
+        } elseif (! $response instanceof ResponseInterface &&
+            ($response instanceof Arrayable ||
+             $response instanceof Jsonable ||
+             $response instanceof ArrayObject ||
+             $response instanceof JsonSerializable ||
+             $response instanceof stdClass ||
+             is_array($response))) {
+            $response = new JsonResponse($response);
+        } elseif (! $response instanceof ResponseInterface) {
+            $response = (new ResponseFactory)->createResponse()
+                ->withBody((new StreamFactory)->createStream($response));
         }
-
-        return (new ResponseFactory)->createResponse()
-            ->withBody((new StreamFactory)->createStream($response));
+    
+        return $response;
     }
 
     /**

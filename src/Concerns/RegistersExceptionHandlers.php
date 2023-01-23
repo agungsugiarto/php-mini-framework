@@ -2,16 +2,16 @@
 
 namespace Mini\Framework\Concerns;
 
-use ErrorException;
 use Exception;
-use Illuminate\Contracts\Debug\ExceptionHandler;
+use Throwable;
+use ErrorException;
 use Illuminate\Log\LogManager;
-use League\Route\Http\Exception\NotFoundException;
 use Mini\Framework\Exceptions\Handler;
 use Mini\Framework\Exceptions\HttpException;
+use Mini\Framework\Exceptions\NotFoundHttpException;
+use Illuminate\Contracts\Debug\ExceptionHandler;
 use Symfony\Component\Console\Output\ConsoleOutput;
 use Symfony\Component\ErrorHandler\Error\FatalError;
-use Throwable;
 
 trait RegistersExceptionHandlers
 {
@@ -23,12 +23,12 @@ trait RegistersExceptionHandlers
      *
      * @return void
      *
-     * @throws \League\Route\Http\Exception\HttpExceptionInterface
+     * @throws \Mini\Framework\Exceptions\HttpExceptionInterface
      */
     public function abort($code, $message = '', array $headers = [])
     {
         if ($code == 404) {
-            throw new NotFoundException($message);
+            throw new NotFoundHttpException($message);
         }
 
         throw new HttpException($code, $message, null, $headers, $code);
