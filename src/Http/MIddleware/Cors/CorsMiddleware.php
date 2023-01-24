@@ -3,13 +3,12 @@
 namespace Mini\Framework\Http\Middleware\Cors;
 
 use Closure;
-use Mini\Framework\Http\Middleware\Cors\CorsService;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
 class CorsMiddleware
 {
-    /** @var CorsService $cors */
+    /** @var CorsService */
     protected $cors;
 
     public function __construct(CorsService $cors)
@@ -44,7 +43,6 @@ class CorsMiddleware
 
     /**
      * Add the headers to the Response, if they don't exist yet.
-     *
      */
     protected function addHeaders(ServerRequestInterface $request, ResponseInterface $response): ResponseInterface
     {

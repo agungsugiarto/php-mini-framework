@@ -2,7 +2,6 @@
 
 namespace Mini\Framework\Http\Middleware\Cors;
 
-use Laminas\Diactoros\Response;
 use Laminas\Diactoros\ResponseFactory;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -24,25 +23,32 @@ use Psr\Http\Message\ServerRequestInterface;
  *  'exposed_headers'?: string[]|false,
  *  'max_age'?: int|bool|null
  * }
- *
  */
 class CorsService
 {
-    /** @var string[]  */
+    /** @var string[] */
     private array $allowedOrigins = [];
+
     /** @var string[] */
     private array $allowedOriginsPatterns = [];
+
     /** @var string[] */
     private array $allowedMethods = [];
+
     /** @var string[] */
     private array $allowedHeaders = [];
+
     /** @var string[] */
     private array $exposedHeaders = [];
+
     private bool $supportsCredentials = false;
+
     private ?int $maxAge = 0;
 
     private bool $allowAllOrigins = false;
+
     private bool $allowAllMethods = false;
+
     private bool $allowAllHeaders = false;
 
     public function __construct(array $options = [])
@@ -71,7 +77,7 @@ class CorsService
         } elseif (array_key_exists('max_age', $options)) {
             $maxAge = $options['max_age'];
         }
-        $this->maxAge = $maxAge === null ? null : (int)$maxAge;
+        $this->maxAge = $maxAge === null ? null : (int) $maxAge;
 
         $exposedHeaders = $options['exposedHeaders'] ?? $options['exposed_headers'] ?? $this->exposedHeaders;
         $this->exposedHeaders = $exposedHeaders === false ? [] : $exposedHeaders;
@@ -91,7 +97,7 @@ class CorsService
         $this->allowAllMethods = in_array('*', $this->allowedMethods);
 
         // Transform wildcard pattern
-        if (!$this->allowAllOrigins) {
+        if (! $this->allowAllOrigins) {
             foreach ($this->allowedOrigins as $origin) {
                 if (strpos($origin, '*') !== false) {
                     $this->allowedOriginsPatterns[] = $this->convertWildcardToPattern($origin);
@@ -101,10 +107,12 @@ class CorsService
     }
 
     /**
-     * Create a pattern for a wildcard, based on Str::is() from Laravel
+     * Create a pattern for a wildcard, based on Str::is() from Laravel.
      *
      * @see https://github.com/laravel/framework/blob/5.5/src/Illuminate/Support/Str.php
+     *
      * @param string $pattern
+     *
      * @return string
      */
     private function convertWildcardToPattern($pattern)
@@ -116,7 +124,7 @@ class CorsService
         // pattern such as "*.example.com", making any string check convenient.
         $pattern = str_replace('\*', '.*', $pattern);
 
-        return '#^' . $pattern . '\z#u';
+        return '#^'.$pattern.'\z#u';
     }
 
     public function isCorsRequest(ServerRequestInterface $request): bool
@@ -186,7 +194,7 @@ class CorsService
 
     private function configureAllowedOrigin(ResponseInterface $response, ServerRequestInterface $request): ResponseInterface
     {
-        if ($this->allowAllOrigins === true && !$this->supportsCredentials) {
+        if ($this->allowAllOrigins === true && ! $this->supportsCredentials) {
             // Safe+cacheable, allow everything
             $response = $response->withAddedHeader('Access-Control-Allow-Origin', '*');
         } elseif ($this->isSingleOriginAllowed()) {
@@ -269,10 +277,10 @@ class CorsService
 
     public function varyHeader(ResponseInterface $response, string $header): ResponseInterface
     {
-        if (!$response->hasHeader('Vary')) {
+        if (! $response->hasHeader('Vary')) {
             $response = $response->withAddedHeader('Vary', $header);
-        } elseif (!in_array($header, explode(', ', (string) $response->getHeaderLine('Vary')))) {
-            $response = $response->withAddedHeader('Vary', ((string) $response->getHeaderLine('Vary')) . ', ' . $header);
+        } elseif (! in_array($header, explode(', ', (string) $response->getHeaderLine('Vary')))) {
+            $response = $response->withAddedHeader('Vary', ((string) $response->getHeaderLine('Vary')).', '.$header);
         }
 
         return $response;

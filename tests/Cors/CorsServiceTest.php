@@ -1,7 +1,7 @@
 <?php
 
-use PHPUnit\Framework\TestCase;
 use Mini\Framework\Http\Middleware\Cors\CorsService;
+use PHPUnit\Framework\TestCase;
 
 class CorsServiceTest extends TestCase
 {
@@ -270,7 +270,6 @@ class CorsServiceTest extends TestCase
     }
 
     /**
-     * @param CorsService $service
      * @return CorsNormalizedOptions
      */
     private function getOptionsFromService(CorsService $service): array
@@ -285,7 +284,7 @@ class CorsServiceTest extends TestCase
             $options[$property->getName()] = $property->getValue($service);
         }
 
-        /** @var CorsNormalizedOptions $options */
+        /* @var CorsNormalizedOptions $options */
         return $options;
     }
 }
