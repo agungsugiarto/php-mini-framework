@@ -56,9 +56,7 @@ class CorsMiddleware
     }
 
     /**
-     * The the path from the config, to see if the CORS Service should run
-     *
-     * @return bool
+     * The the path from the config, to see if the CORS Service should run.
      */
     protected function isMatchingPath(ServerRequestInterface $request): bool
     {
@@ -79,9 +77,8 @@ class CorsMiddleware
     }
 
     /**
-     * Paths by given host or string values in config by default
+     * Paths by given host or string values in config by default.
      *
-     * @param string $host
      * @return array
      */
     protected function getPathsByHost(string $host)
