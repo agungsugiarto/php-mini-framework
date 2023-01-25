@@ -3,6 +3,7 @@
 namespace Mini\Framework\Http\Middleware\Cors;
 
 use Closure;
+use Illuminate\Support\Str;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
@@ -18,10 +19,10 @@ class CorsMiddleware
 
     public function handle(ServerRequestInterface $request, Closure $next)
     {
-        // // Check if we're dealing with CORS and if we should handle it
-        // if (! $this->shouldRun($request)) {
-        //     return $next($request);
-        // }
+        // Check if we're dealing with CORS and if we should handle it
+        if (! $this->isMatchingPath($request)) {
+            return $next($request);
+        }
 
         // For Preflight, return the Preflight response
         if ($this->cors->isPreflightRequest($request)) {
@@ -54,55 +55,52 @@ class CorsMiddleware
         return $response;
     }
 
-    // /**
-    //  * Determine if the request has a URI that should pass through the CORS flow.
-    //  *
-    //  * @return bool
-    //  */
-    // protected function shouldRun(ServerRequestInterface $request): bool
-    // {
-    //     return $this->isMatchingPath($request);
-    // }
+    /**
+     * The the path from the config, to see if the CORS Service should run
+     *
+     * @return bool
+     */
+    protected function isMatchingPath(ServerRequestInterface $request): bool
+    {
+        // Get the paths from the config or the middleware
+        $paths = $this->getPathsByHost($request->getUri()->getHost());
 
-    // /**
-    //  * The the path from the config, to see if the CORS Service should run
-    //  *
-    //  * @return bool
-    //  */
-    // protected function isMatchingPath(ServerRequestInterface $request): bool
-    // {
-    //     // Get the paths from the config or the middleware
-    //     $paths = $this->getPathsByHost($request->getUri()->getHost());
+        foreach ($paths as $path) {
+            if ($path !== '/') {
+                $path = trim($path, '/');
+            }
 
-    //     foreach ($paths as $path) {
-    //         if ($path !== '/') {
-    //             $path = trim($path, '/');
-    //         }
+            if ($this->requestIs($request, $path)) {
+                return true;
+            }
+        }
 
-    //         if ($request->fullUrlIs($path) || $request->is($path)) {
-    //             return true;
-    //         }
-    //     }
+        return false;
+    }
 
-    //     return false;
-    // }
+    /**
+     * Paths by given host or string values in config by default
+     *
+     * @param string $host
+     * @return array
+     */
+    protected function getPathsByHost(string $host)
+    {
+        $paths = config('cors.paths', []);
+        // If where are paths by given host
+        if (isset($paths[$host])) {
+            return $paths[$host];
+        }
+        // Defaults
+        return array_filter($paths, function ($path) {
+            return is_string($path);
+        });
+    }
 
-    // /**
-    //  * Paths by given host or string values in config by default
-    //  *
-    //  * @param string $host
-    //  * @return array
-    //  */
-    // protected function getPathsByHost(string $host)
-    // {
-    //     $paths = config('cors.paths', []);
-    //     // If where are paths by given host
-    //     if (isset($paths[$host])) {
-    //         return $paths[$host];
-    //     }
-    //     // Defaults
-    //     return array_filter($paths, function ($path) {
-    //         return is_string($path);
-    //     });
-    // }
+    protected function requestIs(ServerRequestInterface $request, ...$patterns)
+    {
+        $path = rawurldecode($request->getUri()->getPath());
+
+        return collect($patterns)->contains(fn ($pattern) => Str::is($pattern, $path));
+    }
 }
