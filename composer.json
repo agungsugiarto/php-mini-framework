@@ -38,6 +38,7 @@
         "illuminate/pagination": "^9.36.3",
         "illuminate/pipeline": "^9.36.3",
         "illuminate/queue": "^9.36.3",
+        "illuminate/session": "^9.36.3",
         "illuminate/support": "^9.36.3",
         "illuminate/testing": "^9.36.3",
         "illuminate/translation": "^9.36.3",

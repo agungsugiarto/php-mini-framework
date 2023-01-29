@@ -2,6 +2,7 @@
 
 use Laminas\Diactoros\Response;
 use Laminas\Diactoros\Response\TextResponse;
+use Laminas\Diactoros\StreamFactory;
 use Mini\Framework\Application;
 use Mini\Framework\Http\ServerRequestFactory;
 use Mockery as m;
@@ -79,8 +80,8 @@ class FullApplicationTest extends TestCase
         $this->assertEquals(200, $response->getStatusCode());
         $this->assertEquals('12', $response->getBody()->getContents());
 
-        // $this->assertEquals(1, $request->route('bar'));
-        // $this->assertEquals(2, $request->route('baz'));
+        $this->assertEquals(1, $request->route('bar'));
+        $this->assertEquals(2, $request->route('baz'));
     }
 
     public function testCallbackRouteWithDefaultParameter()
@@ -204,23 +205,23 @@ class FullApplicationTest extends TestCase
     // {
     //     $app = new Application;
 
-    //     $app->middleware(['LumenTestTerminateMiddleware']);
+    //     $app->middleware(['MiniTestTerminateMiddleware']);
 
     //     $app->router->get('/', function () {
-    //         return response('Hello World');
+    //         return new TextResponse('Hello World');
     //     });
 
-    //     $response = $app->handle(Request::create('/', 'GET'));
+    //     $response = $app->handle((new ServerRequestFactory)->createServerRequest('GET', '/'));
 
     //     $this->assertEquals(200, $response->getStatusCode());
-    //     $this->assertEquals('TERMINATED', $response->getContent());
+    //     $this->assertEquals('TERMINATED', $response->getBody()->getContents());
     // }
 
     // public function testTerminateWithMiddlewareDisabled()
     // {
     //     $app = new Application;
 
-    //     $app->middleware(['LumenTestTerminateMiddleware']);
+    //     $app->middleware(['MiniTestTerminateMiddleware']);
     //     $app->instance('middleware.disable', true);
 
     //     $app->router->get('/', function () {
@@ -233,35 +234,35 @@ class FullApplicationTest extends TestCase
     //     $this->assertEquals('Hello World', $response->getContent());
     // }
 
-    // public function testNotFoundResponse()
-    // {
-    //     $app = new Application;
-    //     $app->instance(ExceptionHandler::class, $mock = m::mock('Mini\Framework\Exceptions\Handler[report]'));
-    //     $mock->shouldIgnoreMissing();
+    public function testNotFoundResponse()
+    {
+        $app = new Application;
+        $app->instance(ExceptionHandler::class, $mock = m::mock('Mini\Framework\Exceptions\Handler[report]'));
+        $mock->shouldIgnoreMissing();
 
-    //     $app->router->get('/', function () {
-    //         return response('Hello World');
-    //     });
+        $app->router->get('/', function () {
+            return new TextResponse('Hello World');
+        });
 
-    //     $response = $app->handle(Request::create('/foo', 'GET'));
+        $response = $app->handle((new ServerRequestFactory)->createServerRequest('GET', '/foo'));
 
-    //     $this->assertEquals(404, $response->getStatusCode());
-    // }
+        $this->assertEquals(404, $response->getStatusCode());
+    }
 
-    // public function testMethodNotAllowedResponse()
-    // {
-    //     $app = new Application;
-    //     $app->instance(ExceptionHandler::class, $mock = m::mock('Mini\Framework\Exceptions\Handler[report]'));
-    //     $mock->shouldIgnoreMissing();
+    public function testMethodNotAllowedResponse()
+    {
+        $app = new Application;
+        $app->instance(ExceptionHandler::class, $mock = m::mock('Mini\Framework\Exceptions\Handler[report]'));
+        $mock->shouldIgnoreMissing();
 
-    //     $app->router->post('/', function () {
-    //         return response('Hello World');
-    //     });
+        $app->router->post('/', function () {
+            return new TextResponse('Hello World');
+        });
 
-    //     $response = $app->handle(Request::create('/', 'GET'));
+        $response = $app->handle((new ServerRequestFactory)->createServerRequest('GET', '/'));
 
-    //     $this->assertEquals(405, $response->getStatusCode());
-    // }
+        $this->assertEquals(405, $response->getStatusCode());
+    }
 
     // public function testResponsableInterface()
     // {
@@ -271,31 +272,30 @@ class FullApplicationTest extends TestCase
     //         return new ResponsableResponse;
     //     });
 
-    //     $request = Request::create('/foo/999', 'GET');
-    //     $response = $app->handle($request);
+    //     $response = $app->handle($request = (new ServerRequestFactory)->createServerRequest('GET', '/foo/999'));
 
     //     $this->assertEquals(999, $request->route('foo'));
     //     $this->assertEquals(999, $response->original);
     // }
 
-    // public function testUncaughtExceptionResponse()
-    // {
-    //     $app = new Application;
-    //     $app->instance(ExceptionHandler::class, $mock = m::mock('Mini\Framework\Exceptions\Handler[report]'));
-    //     $mock->shouldIgnoreMissing();
+    public function testUncaughtExceptionResponse()
+    {
+        $app = new Application;
+        $app->instance(ExceptionHandler::class, $mock = m::mock('Mini\Framework\Exceptions\Handler[report]'));
+        $mock->shouldIgnoreMissing();
 
-    //     $app->router->get('/', function () {
-    //         throw new \RuntimeException('app exception');
-    //     });
+        $app->router->get('/', function () {
+            throw new \RuntimeException('app exception');
+        });
 
-    //     $response = $app->handle(Request::create('/', 'GET'));
-    //     $this->assertInstanceOf(Response::class, $response);
-    // }
+        $response = $app->handle((new ServerRequestFactory)->createServerRequest('GET', '/'));
+        $this->assertInstanceOf(Response::class, $response);
+    }
 
     // public function testGeneratingUrls()
     // {
     //     $app = new Application;
-    //     $app->instance('request', Request::create('http://lumen.laravel.com', 'GET'));
+    //     $app->instance('request', (new ServerRequestFactory)->createServerRequest('GET', '/'));
 
     //     $app->router->get('/foo-bar', ['as' => 'foo', function () {
     //         //
@@ -313,7 +313,7 @@ class FullApplicationTest extends TestCase
     //         //
     //     }]);
 
-    //     $this->assertEquals('http://lumen.laravel.com/something', url('something'));
+    //     $this->assertEquals('SERVER_NAME/something', url('something'));
     //     $this->assertEquals('http://lumen.laravel.com/foo-bar', route('foo'));
     //     $this->assertEquals('http://lumen.laravel.com/foo-bar/1/2', route('bar', ['baz' => 1, 'boom' => 2]));
     //     $this->assertEquals('http://lumen.laravel.com/foo-bar?baz=1&boom=2', route('foo', ['baz' => 1, 'boom' => 2]));
@@ -919,26 +919,26 @@ class MiniTestParameterizedMiddleware
 // {
 // }
 
-// class LumenTestTerminateMiddleware
-// {
-//     public function handle($request, $next)
-//     {
-//         return $next($request);
-//     }
+class MiniTestTerminateMiddleware
+{
+    public function handle($request, $next)
+    {
+        return $next($request);
+    }
 
-//     public function terminate($request, Response $response)
-//     {
-//         $response->setContent('TERMINATED');
-//     }
-// }
+    public function terminate($request, Response $response)
+    {
+        $response->withBody((new StreamFactory)->createStream('TERMINATED'));
+    }
+}
 
-// class ResponsableResponse implements \Illuminate\Contracts\Support\Responsable
-// {
-//     public function toResponse($request)
-//     {
-//         return $request->route('foo');
-//     }
-// }
+class ResponsableResponse implements \Illuminate\Contracts\Support\Responsable
+{
+    public function toResponse($request)
+    {
+        return $request->route('foo');
+    }
+}
 
 // class SendEmails extends Command
 // {

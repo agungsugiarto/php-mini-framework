@@ -2,38 +2,40 @@
 
 namespace Mini\Framework;
 
-use Illuminate\Broadcasting\BroadcastServiceProvider;
-use Illuminate\Bus\BusServiceProvider;
-use Illuminate\Cache\CacheServiceProvider;
-use Illuminate\Config\Repository as ConfigRepository;
-use Illuminate\Container\Container;
-use Illuminate\Contracts\Broadcasting\Broadcaster;
-use Illuminate\Contracts\Broadcasting\Factory;
-use Illuminate\Contracts\Bus\Dispatcher;
-use Illuminate\Database\DatabaseServiceProvider;
-use Illuminate\Database\MigrationServiceProvider;
-use Illuminate\Encryption\EncryptionServiceProvider;
-use Illuminate\Events\EventServiceProvider;
-use Illuminate\Filesystem\Filesystem;
-use Illuminate\Filesystem\FilesystemServiceProvider;
-use Illuminate\Hashing\HashServiceProvider;
+use RuntimeException;
+use Illuminate\Support\Str;
+use Psr\Log\LoggerInterface;
 use Illuminate\Log\LogManager;
-use Illuminate\Pagination\PaginationServiceProvider;
-use Illuminate\Queue\QueueServiceProvider;
 use Illuminate\Support\Composer;
+use Mini\Framework\Routing\Router;
+use Illuminate\Container\Container;
+use Illuminate\Filesystem\Filesystem;
+use Illuminate\Bus\BusServiceProvider;
+use Illuminate\Session\SessionManager;
 use Illuminate\Support\Facades\Facade;
 use Illuminate\Support\ServiceProvider;
-use Illuminate\Support\Str;
-use Illuminate\Translation\TranslationServiceProvider;
-use Illuminate\Validation\ValidationServiceProvider;
+use Illuminate\Contracts\Bus\Dispatcher;
 use Illuminate\View\ViewServiceProvider;
-use Mini\Framework\Concerns\RegistersExceptionHandlers;
+use Illuminate\Cache\CacheServiceProvider;
+use Illuminate\Queue\QueueServiceProvider;
+use Illuminate\Events\EventServiceProvider;
+use Illuminate\Hashing\HashServiceProvider;
 use Mini\Framework\Concerns\RoutesRequests;
-use Mini\Framework\Console\ConsoleServiceProvider;
-use Mini\Framework\Routing\Router;
 use Psr\Http\Server\RequestHandlerInterface;
-use Psr\Log\LoggerInterface;
-use RuntimeException;
+use Illuminate\Contracts\Broadcasting\Factory;
+use Illuminate\Database\DatabaseServiceProvider;
+use Mini\Framework\Http\Middleware\StartSession;
+use Illuminate\Database\MigrationServiceProvider;
+use Illuminate\Contracts\Broadcasting\Broadcaster;
+use Mini\Framework\Console\ConsoleServiceProvider;
+use Illuminate\Encryption\EncryptionServiceProvider;
+use Illuminate\Filesystem\FilesystemServiceProvider;
+use Illuminate\Pagination\PaginationServiceProvider;
+use Illuminate\Validation\ValidationServiceProvider;
+use Illuminate\Broadcasting\BroadcastServiceProvider;
+use Illuminate\Config\Repository as ConfigRepository;
+use Illuminate\Translation\TranslationServiceProvider;
+use Mini\Framework\Concerns\RegistersExceptionHandlers;
 
 class Application extends Container implements RequestHandlerInterface
 {
@@ -497,6 +499,33 @@ class Application extends Container implements RequestHandlerInterface
     {
         $this->singleton('router', function () {
             return $this->router;
+        });
+    }
+
+    /**
+     * Register container bindings for the application.
+     *
+     * @return void
+     */
+    protected function registerSessionBindings()
+    {
+        $this->configure('session');
+
+        $this->singleton('session', function ($app) {
+            return new SessionManager($app);
+        });
+
+        $this->singleton('session.store', function ($app) {
+            // First, we will create the session manager which is responsible for the
+            // creation of the various session drivers when they are needed by the
+            // application instance, and will resolve them on a lazy load basis.
+            return $app->make('session')->driver();
+        });
+
+        $this->singleton(StartSession::class, function ($app) {
+            return new StartSession($app->make(SessionManager::class), function () use ($app) {
+                return $app->make(\Illuminate\Contracts\Cache\Factory::class);
+            });
         });
     }
 
@@ -1017,6 +1046,7 @@ class Application extends Container implements RequestHandlerInterface
             \Illuminate\Contracts\Redis\Connection::class => 'redis.connection',
             'request' => \Psr\Http\Message\ServerRequestInterface::class,
             \Mini\Framework\Routing\Router::class => 'router',
+            \Illuminate\Session\SessionManager::class => 'session',
             \Illuminate\Contracts\Translation\Translator::class => 'translator',
             \Mini\Framework\Routing\UrlGenerator::class => 'url',
             \Illuminate\Contracts\Validation\Factory::class => 'validator',
@@ -1061,6 +1091,7 @@ class Application extends Container implements RequestHandlerInterface
         \Illuminate\Contracts\Queue\Factory::class => 'registerQueueBindings',
         \Illuminate\Contracts\Queue\Queue::class => 'registerQueueBindings',
         'router' => 'registerRouterBindings',
+        'session' => 'registerSessionBindings',
         'translator' => 'registerTranslationBindings',
         'url' => 'registerUrlGeneratorBindings',
         'validator' => 'registerValidatorBindings',
