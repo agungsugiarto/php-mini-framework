@@ -31,7 +31,9 @@ use Illuminate\View\ViewServiceProvider;
 use Mini\Framework\Concerns\RegistersExceptionHandlers;
 use Mini\Framework\Concerns\RoutesRequests;
 use Mini\Framework\Console\ConsoleServiceProvider;
+use Mini\Framework\Http\Middleware\Cors\CorsService;
 use Mini\Framework\Http\Middleware\StartSession;
+use Mini\Framework\Providers\CorsServiceProvider;
 use Mini\Framework\Routing\Router;
 use Psr\Http\Server\RequestHandlerInterface;
 use Psr\Log\LoggerInterface;
@@ -600,6 +602,18 @@ class Application extends Container implements RequestHandlerInterface
     }
 
     /**
+     * Register container bindings for the application.
+     *
+     * @return void
+     */
+    protected function registerCorsServiceBindings()
+    {
+        $this->singleton(CorsService::class, function () {
+            return $this->loadComponent('cors', CorsServiceProvider::class, CorsService::class);
+        });
+    }
+
+    /**
      * Configure and load the given component and provider.
      *
      * @param string       $config
@@ -1098,5 +1112,6 @@ class Application extends Container implements RequestHandlerInterface
         \Illuminate\Contracts\Validation\Factory::class => 'registerValidatorBindings',
         'view' => 'registerViewBindings',
         \Illuminate\Contracts\View\Factory::class => 'registerViewBindings',
+        \Mini\Framework\Http\Middleware\Cors\CorsService::class => 'registerCorsServiceBindings',
     ];
 }
