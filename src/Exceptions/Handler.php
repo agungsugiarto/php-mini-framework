@@ -3,19 +3,20 @@
 namespace Mini\Framework\Exceptions;
 
 use Exception;
-use Illuminate\Console\View\Components\BulletList;
-use Illuminate\Console\View\Components\Error;
-use Illuminate\Contracts\Debug\ExceptionHandler;
-use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Throwable;
 use Illuminate\Support\Arr;
-use Illuminate\Validation\ValidationException;
+use Psr\Log\LoggerInterface;
 use Laminas\Diactoros\Response\HtmlResponse;
 use Laminas\Diactoros\Response\JsonResponse;
-use Psr\Log\LoggerInterface;
+use Illuminate\Console\View\Components\Error;
+use Illuminate\Validation\ValidationException;
+use Illuminate\Contracts\Debug\ExceptionHandler;
+use Illuminate\Console\View\Components\BulletList;
+use Illuminate\Contracts\Foundation\ExceptionRenderer;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Symfony\Component\Console\Application as ConsoleApplication;
 use Symfony\Component\Console\Exception\CommandNotFoundException;
 use Symfony\Component\ErrorHandler\ErrorRenderer\HtmlErrorRenderer;
-use Throwable;
 
 class Handler implements ExceptionHandler
 {
@@ -164,7 +165,7 @@ class Handler implements ExceptionHandler
     protected function prepareResponse($request, Throwable $e)
     {
         $response = new HtmlResponse(
-            $this->renderExceptionWithSymfony($e, config('app.debug', false)),
+            $this->renderExceptionContent($e),
             $this->isHttpException($e) ? $e->getStatusCode() : 500,
             $this->isHttpException($e) ? $e->getHeaders() : []
         );
@@ -172,6 +173,34 @@ class Handler implements ExceptionHandler
         $response->exception = $e;
 
         return $response;
+    }
+
+    /**
+     * Get the response content for the given exception.
+     *
+     * @param  \Throwable  $e
+     * @return string
+     */
+    protected function renderExceptionContent(Throwable $e)
+    {
+        try {
+            return config('app.debug') && app()->has(ExceptionRenderer::class)
+                ? $this->renderExceptionWithCustomRenderer($e)
+                : $this->renderExceptionWithSymfony($e, config('app.debug'));
+        } catch (Throwable $e) {
+            return $this->renderExceptionWithSymfony($e, config('app.debug'));
+        }
+    }
+
+    /**
+     * Render an exception to a string using the registered `ExceptionRenderer`.
+     *
+     * @param  \Throwable  $e
+     * @return string
+     */
+    protected function renderExceptionWithCustomRenderer(Throwable $e)
+    {
+        return app(ExceptionRenderer::class)->render($e);
     }
 
     /**
