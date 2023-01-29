@@ -257,9 +257,10 @@ if (! function_exists('route')) {
     /**
      * Generate a URL to a named route.
      *
-     * @param  string  $name
-     * @param  array  $parameters
-     * @param  bool|null  $secure
+     * @param string    $name
+     * @param array     $parameters
+     * @param bool|null $secure
+     *
      * @return string
      */
     function route($name, $parameters = [], $secure = null)
@@ -274,8 +275,9 @@ if (! function_exists('session')) {
      *
      * If an array is passed as the key, we will assume you want to set an array of values.
      *
-     * @param  array|string|null  $key
-     * @param  mixed  $default
+     * @param array|string|null $key
+     * @param mixed             $default
+     *
      * @return mixed|\Illuminate\Session\Store|\Illuminate\Session\SessionManager
      */
     function session($key = null, $default = null)
@@ -362,9 +364,10 @@ if (! function_exists('url')) {
     /**
      * Generate a url for the application.
      *
-     * @param  string  $path
-     * @param  mixed  $parameters
-     * @param  bool|null  $secure
+     * @param string    $path
+     * @param mixed     $parameters
+     * @param bool|null $secure
+     *
      * @return string
      */
     function url($path = null, $parameters = [], $secure = null)

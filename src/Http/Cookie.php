@@ -10,23 +10,35 @@ namespace Mini\Framework\Http;
 class Cookie
 {
     public const SAMESITE_NONE = 'none';
+
     public const SAMESITE_LAX = 'lax';
+
     public const SAMESITE_STRICT = 'strict';
 
     protected $name;
+
     protected $value;
+
     protected $domain;
+
     protected $expire;
+
     protected $path;
+
     protected $secure;
+
     protected $httpOnly;
 
     private bool $raw;
+
     private ?string $sameSite = null;
+
     private bool $secureDefault = false;
 
     private const RESERVED_CHARS_LIST = "=,; \t\r\n\v\f";
+
     private const RESERVED_CHARS_FROM = ['=', ',', ';', ' ', "\t", "\r", "\n", "\v", "\f"];
+
     private const RESERVED_CHARS_TO = ['%3D', '%2C', '%3B', '%20', '%09', '%0D', '%0A', '%0B', '%0C'];
 
     public static function create(string $name, string $value = null, int|string|\DateTimeInterface $expire = 0, ?string $path = '/', string $domain = null, bool $secure = null, bool $httpOnly = true, bool $raw = false, ?string $sameSite = self::SAMESITE_LAX): self
@@ -110,7 +122,7 @@ class Cookie
         // convert expiration time to a Unix timestamp
         if ($expire instanceof \DateTimeInterface) {
             $expire = $expire->format('U');
-        } elseif (!is_numeric($expire)) {
+        } elseif (! is_numeric($expire)) {
             $expire = strtotime($expire);
 
             if (false === $expire) {
@@ -180,7 +192,7 @@ class Cookie
             $sameSite = strtolower($sameSite);
         }
 
-        if (!\in_array($sameSite, [self::SAMESITE_LAX, self::SAMESITE_STRICT, self::SAMESITE_NONE, null], true)) {
+        if (! \in_array($sameSite, [self::SAMESITE_LAX, self::SAMESITE_STRICT, self::SAMESITE_NONE, null], true)) {
             throw new \InvalidArgumentException('The "sameSite" parameter value is not valid.');
         }
 

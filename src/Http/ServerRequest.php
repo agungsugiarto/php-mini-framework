@@ -18,7 +18,7 @@ class ServerRequest extends BaseServerRequest
 
     /**
      * Retrieves the singgle file by the name of the input field used to upload it.
-     * 
+     *
      * @return \Psr\Http\Message\UploadedFileInterface|null
      */
     public function getUploadedFile(string $file)

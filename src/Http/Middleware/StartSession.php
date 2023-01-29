@@ -3,12 +3,12 @@
 namespace Mini\Framework\Http\Middleware;
 
 use Closure;
-use Illuminate\Support\Carbon;
-use Mini\Framework\Http\Cookie;
-use Illuminate\Support\Facades\Date;
-use Illuminate\Session\SessionManager;
-use Psr\Http\Message\ResponseInterface;
 use Illuminate\Contracts\Session\Session;
+use Illuminate\Session\SessionManager;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Date;
+use Mini\Framework\Http\Cookie;
+use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
 class StartSession
@@ -30,8 +30,6 @@ class StartSession
     /**
      * Create a new session middleware.
      *
-     * @param  \Illuminate\Session\SessionManager  $manager
-     * @param  callable|null  $cacheFactoryResolver
      * @return void
      */
     public function __construct(SessionManager $manager, callable $cacheFactoryResolver = null)
@@ -43,7 +41,6 @@ class StartSession
     /**
      * Handle an incoming request.
      *
-     * @param  \Closure  $next
      * @return mixed
      */
     public function handle(ServerRequestInterface $request, Closure $next)
@@ -65,9 +62,8 @@ class StartSession
     /**
      * Handle the given request within session state.
      *
-     * @param  \Psr\Http\Message\ServerRequestInterface  $request
-     * @param  \Illuminate\Contracts\Session\Session  $session
-     * @param  \Closure  $next
+     * @param \Illuminate\Contracts\Session\Session $session
+     *
      * @return mixed
      */
     protected function handleRequestWhileBlocking(ServerRequestInterface $request, $session, Closure $next)
@@ -94,9 +90,8 @@ class StartSession
     /**
      * Handle the given request within session state.
      *
-     * @param  \Psr\Http\Message\ServerRequestInterface  $request
-     * @param  \Illuminate\Contracts\Session\Session  $session
-     * @param  \Closure  $next
+     * @param \Illuminate\Contracts\Session\Session $session
+     *
      * @return mixed
      */
     protected function handleStatefulRequest(ServerRequestInterface $request, $session, Closure $next)
@@ -104,7 +99,7 @@ class StartSession
         // If a session driver has been configured, we will need to start the session here
         // so that the data is ready for an application. Note that the sessions do not
         // make use of PHP "native" sessions in any way since they are crappy.
-        $request = $request->withAttribute('session',  $this->startSession($request, $session));
+        $request = $request->withAttribute('session', $this->startSession($request, $session));
 
         $this->collectGarbage($session);
 
@@ -125,7 +120,8 @@ class StartSession
     /**
      * Start the session for the given request.
      *
-     * @param  \Illuminate\Contracts\Session\Session  $session
+     * @param \Illuminate\Contracts\Session\Session $session
+     *
      * @return \Illuminate\Contracts\Session\Session
      */
     protected function startSession(ServerRequestInterface $request, $session)
@@ -152,7 +148,6 @@ class StartSession
     /**
      * Remove the garbage from the session if necessary.
      *
-     * @param  \Illuminate\Contracts\Session\Session  $session
      * @return void
      */
     protected function collectGarbage(Session $session)
@@ -170,7 +165,6 @@ class StartSession
     /**
      * Determine if the configuration odds hit the lottery.
      *
-     * @param  array  $config
      * @return bool
      */
     protected function configHitsLottery(array $config)
@@ -181,24 +175,22 @@ class StartSession
     /**
      * Store the current URL for the request if necessary.
      *
-     * @param  \Psr\Http\Message\ServerRequestInterface  $request
-     * @param  \Illuminate\Contracts\Session\Session  $session
+     * @param \Illuminate\Contracts\Session\Session $session
+     *
      * @return void
      */
     protected function storeCurrentUrl(ServerRequestInterface $request, $session)
     {
-        if ($request->getMethod() === 'GET' && 
-            $request->route() && 
+        if ($request->getMethod() === 'GET' &&
+            $request->route() &&
             'XMLHttpRequest' !== $request->getHeaderLine('X-Requested-With')) {
-                $session->setPreviousUrl($request->getUri()->getPath());
+            $session->setPreviousUrl($request->getUri()->getPath());
         }
     }
 
     /**
      * Add the session cookie to the application response.
      *
-     * @param  \Psr\Http\Message\ResponseInterface  $response
-     * @param  \Illuminate\Contracts\Session\Session  $session
      * @return void
      */
     protected function addCookieToResponse(ResponseInterface $response, Session $session)
@@ -257,7 +249,6 @@ class StartSession
     /**
      * Determine if the configured session driver is persistent.
      *
-     * @param  array|null  $config
      * @return bool
      */
     protected function sessionIsPersistent(array $config = null)
@@ -270,7 +261,8 @@ class StartSession
     /**
      * Resolve the given cache driver.
      *
-     * @param  string  $driver
+     * @param string $driver
+     *
      * @return \Illuminate\Cache\Store
      */
     protected function cache($driver)
