@@ -20,6 +20,7 @@ use Illuminate\Hashing\HashServiceProvider;
 use Illuminate\Log\LogManager;
 use Illuminate\Pagination\PaginationServiceProvider;
 use Illuminate\Queue\QueueServiceProvider;
+use Illuminate\Session\SessionManager;
 use Illuminate\Support\Composer;
 use Illuminate\Support\Facades\Facade;
 use Illuminate\Support\ServiceProvider;
@@ -32,6 +33,7 @@ use Mini\Framework\Concerns\RoutesRequests;
 use Mini\Framework\Console\ConsoleServiceProvider;
 use Mini\Framework\Http\Middleware\Cors\CorsService;
 use Mini\Framework\Providers\CorsServiceProvider;
+use Mini\Framework\Http\Middleware\StartSession;
 use Mini\Framework\Routing\Router;
 use Psr\Http\Server\RequestHandlerInterface;
 use Psr\Log\LoggerInterface;
@@ -499,6 +501,33 @@ class Application extends Container implements RequestHandlerInterface
     {
         $this->singleton('router', function () {
             return $this->router;
+        });
+    }
+
+    /**
+     * Register container bindings for the application.
+     *
+     * @return void
+     */
+    protected function registerSessionBindings()
+    {
+        $this->configure('session');
+
+        $this->singleton('session', function ($app) {
+            return new SessionManager($app);
+        });
+
+        $this->singleton('session.store', function ($app) {
+            // First, we will create the session manager which is responsible for the
+            // creation of the various session drivers when they are needed by the
+            // application instance, and will resolve them on a lazy load basis.
+            return $app->make('session')->driver();
+        });
+
+        $this->singleton(StartSession::class, function ($app) {
+            return new StartSession($app->make(SessionManager::class), function () use ($app) {
+                return $app->make(\Illuminate\Contracts\Cache\Factory::class);
+            });
         });
     }
 
@@ -1031,6 +1060,7 @@ class Application extends Container implements RequestHandlerInterface
             \Illuminate\Contracts\Redis\Connection::class => 'redis.connection',
             'request' => \Psr\Http\Message\ServerRequestInterface::class,
             \Mini\Framework\Routing\Router::class => 'router',
+            \Illuminate\Session\SessionManager::class => 'session',
             \Illuminate\Contracts\Translation\Translator::class => 'translator',
             \Mini\Framework\Routing\UrlGenerator::class => 'url',
             \Illuminate\Contracts\Validation\Factory::class => 'validator',
@@ -1075,6 +1105,7 @@ class Application extends Container implements RequestHandlerInterface
         \Illuminate\Contracts\Queue\Factory::class => 'registerQueueBindings',
         \Illuminate\Contracts\Queue\Queue::class => 'registerQueueBindings',
         'router' => 'registerRouterBindings',
+        'session' => 'registerSessionBindings',
         'translator' => 'registerTranslationBindings',
         'url' => 'registerUrlGeneratorBindings',
         'validator' => 'registerValidatorBindings',

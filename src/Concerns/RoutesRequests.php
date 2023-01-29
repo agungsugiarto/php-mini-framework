@@ -12,6 +12,7 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Illuminate\Support\Stringable;
 use JsonSerializable;
+use Laminas\Diactoros\Response\EmptyResponse;
 use Laminas\Diactoros\Response\JsonResponse;
 use Laminas\Diactoros\ResponseFactory;
 use Laminas\Diactoros\StreamFactory;
@@ -434,6 +435,8 @@ trait RoutesRequests
              $response instanceof stdClass ||
              is_array($response))) {
             $response = new JsonResponse($response);
+        } elseif (empty($response)) {
+            $response = new EmptyResponse();
         } elseif (! $response instanceof ResponseInterface) {
             $response = (new ResponseFactory)->createResponse()
                 ->withBody((new StreamFactory)->createStream($response));

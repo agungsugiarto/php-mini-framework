@@ -253,6 +253,47 @@ if (! function_exists('resource_path')) {
     }
 }
 
+if (! function_exists('route')) {
+    /**
+     * Generate a URL to a named route.
+     *
+     * @param string    $name
+     * @param array     $parameters
+     * @param bool|null $secure
+     *
+     * @return string
+     */
+    function route($name, $parameters = [], $secure = null)
+    {
+        return app('url')->route($name, $parameters, $secure);
+    }
+}
+
+if (! function_exists('session')) {
+    /**
+     * Get / set the specified session value.
+     *
+     * If an array is passed as the key, we will assume you want to set an array of values.
+     *
+     * @param array|string|null $key
+     * @param mixed             $default
+     *
+     * @return mixed|\Illuminate\Session\Store|\Illuminate\Session\SessionManager
+     */
+    function session($key = null, $default = null)
+    {
+        if (is_null($key)) {
+            return app('session');
+        }
+
+        if (is_array($key)) {
+            return app('session')->put($key);
+        }
+
+        return app('session')->get($key, $default);
+    }
+}
+
 if (! function_exists('storage_path')) {
     /**
      * Get the path to the storage folder.
@@ -316,6 +357,22 @@ if (! function_exists('trans_choice')) {
     function trans_choice($id, $number, array $replace = [], $locale = null)
     {
         return app('translator')->choice($id, $number, $replace, $locale);
+    }
+}
+
+if (! function_exists('url')) {
+    /**
+     * Generate a url for the application.
+     *
+     * @param string    $path
+     * @param mixed     $parameters
+     * @param bool|null $secure
+     *
+     * @return string
+     */
+    function url($path = null, $parameters = [], $secure = null)
+    {
+        return app('url')->to($path, $parameters, $secure);
     }
 }
 

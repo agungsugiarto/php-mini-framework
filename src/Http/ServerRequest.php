@@ -17,6 +17,16 @@ class ServerRequest extends BaseServerRequest
     protected $routeResolver;
 
     /**
+     * Retrieves the singgle file by the name of the input field used to upload it.
+     *
+     * @return \Psr\Http\Message\UploadedFileInterface|null
+     */
+    public function getUploadedFile(string $file)
+    {
+        return $this->getUploadedFiles()[$file] ?? null;
+    }
+
+    /**
      * Determine if the route name matches a given pattern.
      *
      * @param mixed $patterns
