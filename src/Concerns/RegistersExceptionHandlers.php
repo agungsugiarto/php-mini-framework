@@ -23,7 +23,8 @@ trait RegistersExceptionHandlers
      *
      * @return void
      *
-     * @throws \Mini\Framework\Exceptions\HttpExceptionInterface
+     * @throws HttpException
+     * @throws NotFoundHttpException
      */
     public function abort($code, $message = '', array $headers = [])
     {

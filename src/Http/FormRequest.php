@@ -9,10 +9,14 @@ abstract class FormRequest
 {
     use ProvidesConvenienceMethods;
 
+    /** @var ServerRequestInterface */
+    public $request;
+
     protected $validate;
 
     public function __construct(ServerRequestInterface $request)
     {
+        $this->request = $request;
         $this->validate = $this->validate($request, $this->rules());
     }
 
@@ -34,5 +38,10 @@ abstract class FormRequest
     public function validated($key = null, $default = null)
     {
         return data_get($this->validate, $key, $default);
+    }
+
+    public function __call($name, $arguments)
+    {
+        return $this->request->{$name}(...$arguments);
     }
 }

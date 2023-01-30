@@ -56,11 +56,7 @@ trait ProvidesConvenienceMethods
     public function validate(ServerRequestInterface $request, array $rules, array $messages = [], array $customAttributes = [])
     {
         $validator = $this->getValidationFactory()->make(
-            array_unique(array_merge(
-                $request->getQueryParams(),
-                $request->getParsedBody(),
-                $request->getUploadedFiles()
-            )),
+            $request->all(),
             $rules,
             $messages,
             $customAttributes

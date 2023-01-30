@@ -1,0 +1,85 @@
+<?php
+
+namespace Mini\Framework\Exceptions\Ignition\ContextProviders;
+
+use Throwable;
+use Illuminate\Database\Eloquent\Model;
+use Psr\Http\Message\ServerRequestInterface;
+use Mini\Framework\Exceptions\Ignition\ContextProviders\RequestContextProvider;
+
+class LaravelRequestContextProvider extends RequestContextProvider
+{
+    protected null|ServerRequestInterface $request;
+
+    public function __construct(ServerRequestInterface $request)
+    {
+        $this->request = $request;
+    }
+
+    /** @return null|array<string, mixed> */
+    public function getUser(): array|null
+    {
+        try {
+            /** @var object|null $user */
+            /** @phpstan-ignore-next-line */
+            $user = $this->request?->user();
+
+            if (! $user) {
+                return null;
+            }
+        } catch (Throwable) {
+            return null;
+        }
+
+        try {
+            if (method_exists($user, 'toFlare')) {
+                return $user->toFlare();
+            }
+
+            if (method_exists($user, 'toArray')) {
+                return $user->toArray();
+            }
+        } catch (Throwable $e) {
+            return null;
+        }
+
+        return null;
+    }
+
+    /** @return null|array<string, mixed> */
+    public function getRoute(): array|null
+    {
+        /**
+         * @phpstan-ignore-next-line
+         * @var ServerRequestInterface|null $route
+         */
+        $route = $this->request->route();
+
+        if (! $route) {
+            return null;
+        }
+
+        return [
+            'route' => $route[1]['as'] ?? '',
+            'routeParameters' => $route[2] ?? [],
+            'controllerAction' => $route[1]['uses'] ?? '',
+            'middleware' => array_values($route[1]['middleware'] ?? []),
+        ];
+    }
+
+    /** @return array<int, mixed> */
+    public function toArray(): array
+    {
+        $properties = parent::toArray();
+
+        if ($route = $this->getRoute()) {
+            $properties['route'] = $route;
+        }
+
+        if ($user = $this->getUser()) {
+            $properties['user'] = $user;
+        }
+
+        return $properties;
+    }
+}
