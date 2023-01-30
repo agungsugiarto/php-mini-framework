@@ -226,7 +226,7 @@ trait InteractsWithInput
      */
     public function keys()
     {
-        return array_merge(array_keys($this->input()), $this->files->keys());
+        return array_merge(array_keys($this->input()), array_keys($this->getUploadedFiles()));
     }
 
     /**
