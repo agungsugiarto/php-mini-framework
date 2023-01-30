@@ -2,42 +2,42 @@
 
 namespace Mini\Framework\Exceptions\Ignition;
 
-use Monolog\Logger;
-use Spatie\FlareClient\Flare;
-use Spatie\Ignition\Ignition;
-use Mini\Framework\Application;
-use Illuminate\View\ViewException;
+use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\ServiceProvider;
+use Illuminate\View\ViewException;
+use Laravel\Octane\Events\RequestReceived;
+use Laravel\Octane\Events\RequestTerminated;
 use Laravel\Octane\Events\TaskReceived;
 use Laravel\Octane\Events\TickReceived;
-use Laravel\Octane\Events\RequestReceived;
-use Spatie\Ignition\Config\IgnitionConfig;
-use Laravel\Octane\Events\RequestTerminated;
-use Spatie\Ignition\Contracts\ConfigManager;
-use Spatie\Ignition\Config\FileConfigManager;
-use Illuminate\Contracts\Debug\ExceptionHandler;
-use Spatie\FlareClient\FlareMiddleware\AddSolutions;
-use Mini\Framework\Exceptions\Ignition\Support\SentReports;
+use Mini\Framework\Application;
+use Mini\Framework\Exceptions\Ignition\Commands\SolutionMakeCommand;
+use Mini\Framework\Exceptions\Ignition\Commands\SolutionProviderMakeCommand;
 use Mini\Framework\Exceptions\Ignition\Commands\TestCommand;
+use Mini\Framework\Exceptions\Ignition\ContextProviders\LaravelContextProviderDetector;
+use Mini\Framework\Exceptions\Ignition\Exceptions\InvalidConfig;
 use Mini\Framework\Exceptions\Ignition\FlareMiddleware\AddJobs;
 use Mini\Framework\Exceptions\Ignition\FlareMiddleware\AddLogs;
-use Mini\Framework\Exceptions\Ignition\Support\FlareLogHandler;
-use Mini\Framework\Exceptions\Ignition\Exceptions\InvalidConfig;
-use Mini\Framework\Exceptions\Ignition\Views\ViewExceptionMapper;
 use Mini\Framework\Exceptions\Ignition\FlareMiddleware\AddQueries;
-use Mini\Framework\Exceptions\Ignition\Commands\SolutionMakeCommand;
-use Mini\Framework\Exceptions\Ignition\Renderers\IgnitionWhoopsHandler;
+use Mini\Framework\Exceptions\Ignition\Http\Middleware\RunnableSolutionsEnabled;
+use Mini\Framework\Exceptions\Ignition\Recorders\DumpRecorder\DumpRecorder;
 use Mini\Framework\Exceptions\Ignition\Recorders\JobRecorder\JobRecorder;
 use Mini\Framework\Exceptions\Ignition\Recorders\LogRecorder\LogRecorder;
-use Mini\Framework\Exceptions\Ignition\Recorders\DumpRecorder\DumpRecorder;
-use Mini\Framework\Exceptions\Ignition\Renderers\IgnitionExceptionRenderer;
-use Mini\Framework\Exceptions\Ignition\Commands\SolutionProviderMakeCommand;
 use Mini\Framework\Exceptions\Ignition\Recorders\QueryRecorder\QueryRecorder;
-use Mini\Framework\Exceptions\Ignition\Http\Middleware\RunnableSolutionsEnabled;
-use Mini\Framework\Exceptions\Ignition\ContextProviders\LaravelContextProviderDetector;
+use Mini\Framework\Exceptions\Ignition\Renderers\IgnitionExceptionRenderer;
+use Mini\Framework\Exceptions\Ignition\Renderers\IgnitionWhoopsHandler;
 use Mini\Framework\Exceptions\Ignition\Solutions\SolutionProviders\SolutionProviderRepository;
+use Mini\Framework\Exceptions\Ignition\Support\FlareLogHandler;
+use Mini\Framework\Exceptions\Ignition\Support\SentReports;
+use Mini\Framework\Exceptions\Ignition\Views\ViewExceptionMapper;
+use Monolog\Logger;
+use Spatie\FlareClient\Flare;
+use Spatie\FlareClient\FlareMiddleware\AddSolutions;
+use Spatie\Ignition\Config\FileConfigManager;
+use Spatie\Ignition\Config\IgnitionConfig;
+use Spatie\Ignition\Contracts\ConfigManager;
 use Spatie\Ignition\Contracts\SolutionProviderRepository as SolutionProviderRepositoryContract;
+use Spatie\Ignition\Ignition;
 
 class IgnitionServiceProvider extends ServiceProvider
 {
@@ -91,11 +91,11 @@ class IgnitionServiceProvider extends ServiceProvider
     protected function publishConfigs(): void
     {
         $this->publishes([
-            __DIR__ . '/../config/ignition.php' => config_path('ignition.php'),
+            __DIR__.'/../config/ignition.php' => config_path('ignition.php'),
         ], 'ignition-config');
 
         $this->publishes([
-            __DIR__ . '/../config/flare.php' => config_path('flare.php'),
+            __DIR__.'/../config/flare.php' => config_path('flare.php'),
         ], 'flare-config');
     }
 
@@ -164,7 +164,7 @@ class IgnitionServiceProvider extends ServiceProvider
         $this->app->singleton(LogRecorder::class, function (Application $app): LogRecorder {
             return new LogRecorder(
                 $app,
-                config()->get('flare.flare_middleware.' . AddLogs::class . '.maximum_number_of_collected_logs')
+                config()->get('flare.flare_middleware.'.AddLogs::class.'.maximum_number_of_collected_logs')
             );
         });
 
@@ -173,8 +173,8 @@ class IgnitionServiceProvider extends ServiceProvider
             function (Application $app): QueryRecorder {
                 return new QueryRecorder(
                     $app,
-                    config('flare.flare_middleware.' . AddQueries::class . '.report_query_bindings', true),
-                    config('flare.flare_middleware.' . AddQueries::class . '.maximum_number_of_collected_queries', 200)
+                    config('flare.flare_middleware.'.AddQueries::class.'.report_query_bindings', true),
+                    config('flare.flare_middleware.'.AddQueries::class.'.maximum_number_of_collected_queries', 200)
                 );
             }
         );
@@ -182,7 +182,7 @@ class IgnitionServiceProvider extends ServiceProvider
         $this->app->singleton(JobRecorder::class, function (Application $app): JobRecorder {
             return new JobRecorder(
                 $app,
-                config('flare.flare_middleware.' . AddJobs::class . '.max_chained_job_reporting_depth', 5)
+                config('flare.flare_middleware.'.AddJobs::class.'.max_chained_job_reporting_depth', 5)
             );
         });
     }
@@ -345,15 +345,15 @@ class IgnitionServiceProvider extends ServiceProvider
         $this->app->get(SentReports::class)->clear();
         $this->app->get(Ignition::class)->reset();
 
-        if (config('flare.flare_middleware.' . AddLogs::class)) {
+        if (config('flare.flare_middleware.'.AddLogs::class)) {
             $this->app->make(LogRecorder::class)->reset();
         }
 
-        if (config('flare.flare_middleware.' . AddQueries::class)) {
+        if (config('flare.flare_middleware.'.AddQueries::class)) {
             $this->app->make(QueryRecorder::class)->reset();
         }
 
-        if (config('flare.flare_middleware.' . AddJobs::class)) {
+        if (config('flare.flare_middleware.'.AddJobs::class)) {
             $this->app->make(JobRecorder::class)->reset();
         }
 

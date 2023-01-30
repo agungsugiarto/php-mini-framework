@@ -3,9 +3,9 @@
 namespace Mini\Framework\Exceptions\Ignition\Solutions\SolutionProviders;
 
 use Livewire\Exceptions\MethodNotFoundException;
-use Spatie\Ignition\Contracts\HasSolutionsForThrowable;
 use Mini\Framework\Exceptions\Ignition\Solutions\SuggestLivewireMethodNameSolution;
 use Mini\Framework\Exceptions\Ignition\Support\LivewireComponentParser;
+use Spatie\Ignition\Contracts\HasSolutionsForThrowable;
 use Throwable;
 
 class UndefinedLivewireMethodSolutionProvider implements HasSolutionsForThrowable

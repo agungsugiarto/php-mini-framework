@@ -58,9 +58,7 @@ class MakeViewVariableOptionalSolution implements RunnableSolution
     }
 
     /**
-     * @param array<string, mixed>  $parameters
-     *
-     * @return bool
+     * @param array<string, mixed> $parameters
      */
     public function isRunnable(array $parameters = []): bool
     {
@@ -69,8 +67,6 @@ class MakeViewVariableOptionalSolution implements RunnableSolution
 
     /**
      * @param array<string, string> $parameters
-     *
-     * @return void
      */
     public function run(array $parameters = []): void
     {
@@ -94,8 +90,6 @@ class MakeViewVariableOptionalSolution implements RunnableSolution
 
     /**
      * @param array<string, string> $parameters
-     *
-     * @return bool|string
      */
     public function makeOptional(array $parameters = []): bool|string
     {
@@ -103,7 +97,7 @@ class MakeViewVariableOptionalSolution implements RunnableSolution
             return false;
         }
 
-        $originalContents = (string)file_get_contents($parameters['viewFile']);
+        $originalContents = (string) file_get_contents($parameters['viewFile']);
         $newContents = str_replace('$'.$parameters['variableName'], '$'.$parameters['variableName']." ?? ''", $originalContents);
 
         $originalTokens = token_get_all(Blade::compileString($originalContents));
@@ -120,7 +114,6 @@ class MakeViewVariableOptionalSolution implements RunnableSolution
 
     /**
      * @param array<int, mixed> $originalTokens
-     * @param string $variableName
      *
      * @return array<int, mixed>
      */

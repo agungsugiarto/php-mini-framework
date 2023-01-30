@@ -3,9 +3,9 @@
 namespace Mini\Framework\Exceptions\Ignition\Solutions\SolutionProviders;
 
 use Livewire\Exceptions\PropertyNotFoundException;
-use Spatie\Ignition\Contracts\HasSolutionsForThrowable;
 use Mini\Framework\Exceptions\Ignition\Solutions\SuggestLivewirePropertyNameSolution;
 use Mini\Framework\Exceptions\Ignition\Support\LivewireComponentParser;
+use Spatie\Ignition\Contracts\HasSolutionsForThrowable;
 use Throwable;
 
 class UndefinedLivewirePropertySolutionProvider implements HasSolutionsForThrowable
@@ -37,8 +37,6 @@ class UndefinedLivewirePropertySolutionProvider implements HasSolutionsForThrowa
     }
 
     /**
-     * @param \Throwable $throwable
-     *
      * @return array<string, string|null>
      */
     protected function getMethodAndComponent(Throwable $throwable): array

@@ -2,12 +2,12 @@
 
 namespace Mini\Framework\Exceptions\Ignition\Recorders\DumpRecorder;
 
-use ReflectionMethod;
-use ReflectionProperty;
 use Illuminate\Support\Arr;
 use Mini\Framework\Application;
-use Symfony\Component\VarDumper\VarDumper;
+use ReflectionMethod;
+use ReflectionProperty;
 use Symfony\Component\VarDumper\Cloner\Data;
+use Symfony\Component\VarDumper\VarDumper;
 
 class DumpRecorder
 {
@@ -108,7 +108,7 @@ class DumpRecorder
      *
      * @param array<T> $stacktrace
      *
-     * @return null|T
+     * @return T|null
      */
     protected function findSourceFrame(array $stacktrace): ?array
     {

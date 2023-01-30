@@ -2,9 +2,9 @@
 
 namespace Mini\Framework\Exceptions\Ignition\FlareMiddleware;
 
+use Mini\Framework\Exceptions\Ignition\Recorders\JobRecorder\JobRecorder;
 use Spatie\FlareClient\FlareMiddleware\FlareMiddleware;
 use Spatie\FlareClient\Report;
-use Mini\Framework\Exceptions\Ignition\Recorders\JobRecorder\JobRecorder;
 
 class AddJobs implements FlareMiddleware
 {

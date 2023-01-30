@@ -5,10 +5,10 @@ namespace Mini\Framework\Exceptions\Ignition\Solutions\SolutionProviders;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\View;
 use InvalidArgumentException;
-use Spatie\Ignition\Contracts\BaseSolution;
-use Spatie\Ignition\Contracts\HasSolutionsForThrowable;
 use Mini\Framework\Exceptions\Ignition\Exceptions\ViewException;
 use Mini\Framework\Exceptions\Ignition\Support\StringComparator;
+use Spatie\Ignition\Contracts\BaseSolution;
+use Spatie\Ignition\Contracts\HasSolutionsForThrowable;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
 use Throwable;
@@ -23,7 +23,7 @@ class ViewNotFoundSolutionProvider implements HasSolutionsForThrowable
             return false;
         }
 
-        return (bool)preg_match(self::REGEX, $throwable->getMessage(), $matches);
+        return (bool) preg_match(self::REGEX, $throwable->getMessage(), $matches);
     }
 
     public function getSolutions(Throwable $throwable): array
@@ -81,7 +81,6 @@ class ViewNotFoundSolutionProvider implements HasSolutionsForThrowable
     }
 
     /**
-     * @param string $path
      * @param array<int, string> $extensions
      *
      * @return array<int, string>

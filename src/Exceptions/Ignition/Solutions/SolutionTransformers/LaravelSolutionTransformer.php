@@ -2,9 +2,9 @@
 
 namespace Mini\Framework\Exceptions\Ignition\Solutions\SolutionTransformers;
 
+use Mini\Framework\Exceptions\Ignition\Http\Controllers\ExecuteSolutionController;
 use Spatie\Ignition\Contracts\RunnableSolution;
 use Spatie\Ignition\Solutions\SolutionTransformer;
-use Mini\Framework\Exceptions\Ignition\Http\Controllers\ExecuteSolutionController;
 use Throwable;
 
 class LaravelSolutionTransformer extends SolutionTransformer

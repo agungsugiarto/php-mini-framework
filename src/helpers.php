@@ -1,17 +1,17 @@
 <?php
 
 use Illuminate\Container\Container;
-use Laminas\Diactoros\UploadedFile;
-use Mini\Framework\Http\Redirector;
-use Mini\Framework\Bus\PendingDispatch;
-use Illuminate\Contracts\Bus\Dispatcher;
-use Psr\Http\Message\UploadedFileInterface;
-use Illuminate\Contracts\Debug\ExceptionHandler;
-use Laminas\Diactoros\Response\RedirectResponse;
-use Laminas\Diactoros\Exception\InvalidArgumentException;
 use Illuminate\Contracts\Broadcasting\Factory as BroadcastFactory;
-use Mini\Framework\Exceptions\Ignition\Renderers\ErrorPageRenderer;
+use Illuminate\Contracts\Bus\Dispatcher;
+use Illuminate\Contracts\Debug\ExceptionHandler;
+use Laminas\Diactoros\Exception\InvalidArgumentException;
 use Laminas\Diactoros\Exception\UnrecognizedProtocolVersionException;
+use Laminas\Diactoros\Response\RedirectResponse;
+use Laminas\Diactoros\UploadedFile;
+use Mini\Framework\Bus\PendingDispatch;
+use Mini\Framework\Exceptions\Ignition\Renderers\ErrorPageRenderer;
+use Mini\Framework\Http\Redirector;
+use Psr\Http\Message\UploadedFileInterface;
 
 if (! function_exists('ddd')) {
     function ddd()
@@ -30,7 +30,7 @@ if (! function_exists('ddd')) {
 
         $renderer->render($exception);
 
-        die();
+        exit();
     }
 }
 
@@ -56,10 +56,10 @@ if (! function_exists('abort_if')) {
     /**
      * Throw an HttpException with the given data if the given condition is true.
      *
-     * @param  bool  $boolean
-     * @param  int  $code
-     * @param  string  $message
-     * @param  array  $headers
+     * @param bool   $boolean
+     * @param int    $code
+     * @param string $message
+     *
      * @return void
      *
      * @throws \Mini\Framework\Exceptions\HttpException
@@ -77,10 +77,10 @@ if (! function_exists('abort_unless')) {
     /**
      * Throw an HttpException with the given data unless the given condition is true.
      *
-     * @param  bool  $boolean
-     * @param  int  $code
-     * @param  string  $message
-     * @param  array  $headers
+     * @param bool   $boolean
+     * @param int    $code
+     * @param string $message
+     *
      * @return void
      *
      * @throws \Mini\Framework\Exceptions\HttpException

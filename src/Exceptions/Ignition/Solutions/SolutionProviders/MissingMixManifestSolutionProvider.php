@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mini\Framework\Exceptions\Ignition\Solutions\SolutionProviders;
 
 use Illuminate\Support\Str;

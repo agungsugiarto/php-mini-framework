@@ -3,9 +3,9 @@
 namespace Mini\Framework\Exceptions\Ignition\Solutions\SolutionProviders;
 
 use Illuminate\Broadcasting\BroadcastException;
+use Mini\Framework\Exceptions\Ignition\Support\LaravelVersion;
 use Spatie\Ignition\Contracts\BaseSolution;
 use Spatie\Ignition\Contracts\HasSolutionsForThrowable;
-use Mini\Framework\Exceptions\Ignition\Support\LaravelVersion;
 use Throwable;
 
 class GenericLaravelExceptionSolutionProvider implements HasSolutionsForThrowable
@@ -25,15 +25,13 @@ class GenericLaravelExceptionSolutionProvider implements HasSolutionsForThrowabl
             ->setSolutionDescription($texts['description'])
             ->setDocumentationLinks($texts['links']);
 
-        return ([$solution]);
+        return [$solution];
     }
 
     /**
-     * @param \Throwable $throwable
-     *
      * @return array<string, mixed>|null
      */
-    protected function getSolutionTexts(Throwable $throwable) : ?array
+    protected function getSolutionTexts(Throwable $throwable): ?array
     {
         foreach ($this->getSupportedExceptions() as $supportedClass => $texts) {
             if ($throwable instanceof $supportedClass) {

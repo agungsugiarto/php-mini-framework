@@ -3,9 +3,9 @@
 namespace Mini\Framework\Exceptions\Ignition\Solutions\SolutionProviders;
 
 use Illuminate\Support\Facades\Route;
+use Mini\Framework\Exceptions\Ignition\Support\StringComparator;
 use Spatie\Ignition\Contracts\BaseSolution;
 use Spatie\Ignition\Contracts\HasSolutionsForThrowable;
-use Mini\Framework\Exceptions\Ignition\Support\StringComparator;
 use Symfony\Component\Routing\Exception\RouteNotFoundException;
 use Throwable;
 
@@ -19,7 +19,7 @@ class RouteNotDefinedSolutionProvider implements HasSolutionsForThrowable
             return false;
         }
 
-        return (bool)preg_match(self::REGEX, $throwable->getMessage(), $matches);
+        return (bool) preg_match(self::REGEX, $throwable->getMessage(), $matches);
     }
 
     public function getSolutions(Throwable $throwable): array

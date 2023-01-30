@@ -2,10 +2,8 @@
 
 namespace Mini\Framework\Exceptions\Ignition\ContextProviders;
 
-use Throwable;
-use Illuminate\Database\Eloquent\Model;
 use Psr\Http\Message\ServerRequestInterface;
-use Mini\Framework\Exceptions\Ignition\ContextProviders\RequestContextProvider;
+use Throwable;
 
 class LaravelRequestContextProvider extends RequestContextProvider
 {
@@ -16,7 +14,7 @@ class LaravelRequestContextProvider extends RequestContextProvider
         $this->request = $request;
     }
 
-    /** @return null|array<string, mixed> */
+    /** @return array<string, mixed>|null */
     public function getUser(): array|null
     {
         try {
@@ -46,11 +44,12 @@ class LaravelRequestContextProvider extends RequestContextProvider
         return null;
     }
 
-    /** @return null|array<string, mixed> */
+    /** @return array<string, mixed>|null */
     public function getRoute(): array|null
     {
         /**
          * @phpstan-ignore-next-line
+         *
          * @var ServerRequestInterface|null $route
          */
         $route = $this->request->route();

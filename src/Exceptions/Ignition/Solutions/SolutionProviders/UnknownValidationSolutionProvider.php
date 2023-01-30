@@ -6,11 +6,11 @@ use BadMethodCallException;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Validator;
+use Mini\Framework\Exceptions\Ignition\Support\StringComparator;
 use ReflectionClass;
 use ReflectionMethod;
 use Spatie\Ignition\Contracts\BaseSolution;
 use Spatie\Ignition\Contracts\HasSolutionsForThrowable;
-use Mini\Framework\Exceptions\Ignition\Support\StringComparator;
 use Throwable;
 
 class UnknownValidationSolutionProvider implements HasSolutionsForThrowable
@@ -37,7 +37,7 @@ class UnknownValidationSolutionProvider implements HasSolutionsForThrowable
 
     protected function getSolutionDescription(Throwable $throwable): string
     {
-        $method = (string)$this->getMethodFromExceptionMessage($throwable->getMessage());
+        $method = (string) $this->getMethodFromExceptionMessage($throwable->getMessage());
 
         $possibleMethod = StringComparator::findSimilarText(
             $this->getAvailableMethods()->toArray(),

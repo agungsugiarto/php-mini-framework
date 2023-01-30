@@ -2,8 +2,8 @@
 
 namespace Mini\Framework\Exceptions\Ignition\Recorders\QueryRecorder;
 
-use Mini\Framework\Application;
 use Illuminate\Database\Events\QueryExecuted;
+use Mini\Framework\Application;
 
 class QueryRecorder
 {
@@ -28,7 +28,7 @@ class QueryRecorder
 
     public function start(): self
     {
-        /** @phpstan-ignore-next-line  */
+        /* @phpstan-ignore-next-line  */
         $this->app['events']->listen(QueryExecuted::class, [$this, 'record']);
 
         return $this;

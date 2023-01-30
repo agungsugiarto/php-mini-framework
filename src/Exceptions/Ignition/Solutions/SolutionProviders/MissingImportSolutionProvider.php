@@ -2,9 +2,9 @@
 
 namespace Mini\Framework\Exceptions\Ignition\Solutions\SolutionProviders;
 
-use Spatie\Ignition\Contracts\HasSolutionsForThrowable;
 use Mini\Framework\Exceptions\Ignition\Solutions\SuggestImportSolution;
 use Mini\Framework\Exceptions\Ignition\Support\Composer\ComposerClassMap;
+use Spatie\Ignition\Contracts\HasSolutionsForThrowable;
 use Throwable;
 
 class MissingImportSolutionProvider implements HasSolutionsForThrowable
@@ -31,8 +31,6 @@ class MissingImportSolutionProvider implements HasSolutionsForThrowable
     }
 
     /**
-     * @param \Throwable $throwable
-     *
      * @return array<int, SuggestImportSolution>
      */
     public function getSolutions(Throwable $throwable): array

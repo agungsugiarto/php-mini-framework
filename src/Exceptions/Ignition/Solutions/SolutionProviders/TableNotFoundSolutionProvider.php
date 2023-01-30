@@ -3,8 +3,8 @@
 namespace Mini\Framework\Exceptions\Ignition\Solutions\SolutionProviders;
 
 use Illuminate\Database\QueryException;
-use Spatie\Ignition\Contracts\HasSolutionsForThrowable;
 use Mini\Framework\Exceptions\Ignition\Solutions\RunMigrationsSolution;
+use Spatie\Ignition\Contracts\HasSolutionsForThrowable;
 use Throwable;
 
 class TableNotFoundSolutionProvider implements HasSolutionsForThrowable

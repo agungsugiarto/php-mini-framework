@@ -2,12 +2,12 @@
 
 namespace Mini\Framework\Exceptions\Ignition\Solutions\SolutionProviders;
 
-use Spatie\Ignition\Contracts\BaseSolution;
-use Spatie\Ignition\Contracts\HasSolutionsForThrowable;
-use Spatie\Ignition\Contracts\Solution;
 use Mini\Framework\Exceptions\Ignition\Exceptions\ViewException;
 use Mini\Framework\Exceptions\Ignition\Solutions\MakeViewVariableOptionalSolution;
 use Mini\Framework\Exceptions\Ignition\Solutions\SuggestCorrectVariableNameSolution;
+use Spatie\Ignition\Contracts\BaseSolution;
+use Spatie\Ignition\Contracts\HasSolutionsForThrowable;
+use Spatie\Ignition\Contracts\Solution;
 use Throwable;
 
 class UndefinedViewVariableSolutionProvider implements HasSolutionsForThrowable
@@ -29,7 +29,7 @@ class UndefinedViewVariableSolutionProvider implements HasSolutionsForThrowable
     {
         $solutions = [];
 
-        /** @phpstan-ignore-next-line  */
+        /* @phpstan-ignore-next-line  */
         extract($this->getNameAndView($throwable));
 
         if (! isset($variableName)) {
@@ -42,15 +42,10 @@ class UndefinedViewVariableSolutionProvider implements HasSolutionsForThrowable
             $solutions[] = $this->findOptionalVariableSolution($variableName, $viewFile);
         }
 
-
         return $solutions;
     }
 
     /**
-     * @param \Mini\Framework\Exceptions\Ignition\Exceptions\ViewException $throwable
-     * @param string $variableName
-     * @param string $viewFile
-     *
      * @return array<int, \Spatie\Ignition\Contracts\Solution>
      */
     protected function findCorrectVariableSolutions(
@@ -88,8 +83,6 @@ class UndefinedViewVariableSolutionProvider implements HasSolutionsForThrowable
     }
 
     /**
-     * @param \Throwable $throwable
-     *
      * @return array<string, string>|null
      */
     protected function getNameAndView(Throwable $throwable): ?array

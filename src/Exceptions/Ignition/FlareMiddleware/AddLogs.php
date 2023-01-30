@@ -2,9 +2,9 @@
 
 namespace Mini\Framework\Exceptions\Ignition\FlareMiddleware;
 
+use Mini\Framework\Exceptions\Ignition\Recorders\LogRecorder\LogRecorder;
 use Spatie\FlareClient\FlareMiddleware\FlareMiddleware;
 use Spatie\FlareClient\Report;
-use Mini\Framework\Exceptions\Ignition\Recorders\LogRecorder\LogRecorder;
 
 class AddLogs implements FlareMiddleware
 {

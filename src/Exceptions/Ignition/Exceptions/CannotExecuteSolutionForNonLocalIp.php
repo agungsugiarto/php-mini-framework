@@ -2,10 +2,10 @@
 
 namespace Mini\Framework\Exceptions\Ignition\Exceptions;
 
-use Spatie\Ignition\Contracts\Solution;
-use Spatie\Ignition\Contracts\BaseSolution;
 use Mini\Framework\Exceptions\HttpException;
+use Spatie\Ignition\Contracts\BaseSolution;
 use Spatie\Ignition\Contracts\ProvidesSolution;
+use Spatie\Ignition\Contracts\Solution;
 
 class CannotExecuteSolutionForNonLocalIp extends HttpException implements ProvidesSolution
 {
@@ -18,6 +18,6 @@ class CannotExecuteSolutionForNonLocalIp extends HttpException implements Provid
     {
         return BaseSolution::create()
             ->setSolutionTitle('Checking your environment settings')
-            ->setSolutionDescription("Solutions can only be executed by requests from a local IP address. Keep in mind that `APP_DEBUG` should set to false on any production environment.");
+            ->setSolutionDescription('Solutions can only be executed by requests from a local IP address. Keep in mind that `APP_DEBUG` should set to false on any production environment.');
     }
 }

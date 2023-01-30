@@ -3,23 +3,25 @@
 namespace Mini\Framework\Exceptions\Ignition\Views;
 
 use Exception;
-use Throwable;
+use Illuminate\Contracts\View\Engine;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Collection;
+use Illuminate\View\Engines\PhpEngine;
+use Illuminate\View\ViewException;
+use Mini\Framework\Application;
+use Mini\Framework\Exceptions\Ignition\Exceptions\ViewException as IgnitionViewException;
+use Mini\Framework\Exceptions\Ignition\Exceptions\ViewExceptionWithSolution;
 use ReflectionClass;
 use ReflectionProperty;
-use Illuminate\Support\Arr;
-use Mini\Framework\Application;
-use Illuminate\Support\Collection;
-use Illuminate\View\ViewException;
-use Illuminate\Contracts\View\Engine;
-use Illuminate\View\Engines\PhpEngine;
 use Spatie\Ignition\Contracts\ProvidesSolution;
-use Mini\Framework\Exceptions\Ignition\Exceptions\ViewExceptionWithSolution;
-use Mini\Framework\Exceptions\Ignition\Exceptions\ViewException as IgnitionViewException;
+use Throwable;
 
 class ViewExceptionMapper
 {
     protected Engine $compilerEngine;
+
     protected BladeSourceMapCompiler $bladeSourceMapCompiler;
+
     protected array $knownPaths;
 
     public function __construct(BladeSourceMapCompiler $bladeSourceMapCompiler)
@@ -46,7 +48,7 @@ class ViewExceptionMapper
         $exception = $this->createException($baseException);
 
         if ($baseException instanceof ProvidesSolution) {
-            /** @var ViewExceptionWithSolution $exception */
+            /* @var ViewExceptionWithSolution $exception */
             $exception->setSolution($baseException->getSolution());
         }
 

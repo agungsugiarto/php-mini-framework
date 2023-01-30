@@ -16,10 +16,7 @@ class LogMessage
     protected ?float $microtime;
 
     /**
-     * @param string|null $message
-     * @param string $level
      * @param array<string, string> $context
-     * @param float|null $microtime
      */
     public function __construct(
         ?string $message,

@@ -3,12 +3,12 @@
 namespace Mini\Framework\Exceptions\Ignition\Http\Controllers;
 
 use Laminas\Diactoros\Response\EmptyResponse;
-use Spatie\Ignition\Contracts\SolutionProviderRepository;
 use Mini\Framework\Exceptions\Ignition\Exceptions\CannotExecuteSolutionForNonLocalIp;
 use Mini\Framework\Exceptions\Ignition\Http\Requests\ExecuteSolutionRequest;
 use Mini\Framework\Exceptions\Ignition\Support\RunnableSolutionsGuard;
 use Mini\Framework\Routing\Controller;
 use Psr\Http\Message\ServerRequestInterface;
+use Spatie\Ignition\Contracts\SolutionProviderRepository;
 
 class ExecuteSolutionController extends Controller
 {

@@ -3,9 +3,9 @@
 namespace Mini\Framework\Exceptions\Ignition\Solutions\SolutionProviders;
 
 use Illuminate\Database\LazyLoadingViolationException;
+use Mini\Framework\Exceptions\Ignition\Support\LaravelVersion;
 use Spatie\Ignition\Contracts\BaseSolution;
 use Spatie\Ignition\Contracts\HasSolutionsForThrowable;
-use Mini\Framework\Exceptions\Ignition\Support\LaravelVersion;
 use Throwable;
 
 class LazyLoadingViolationSolutionProvider implements HasSolutionsForThrowable
@@ -36,6 +36,6 @@ class LazyLoadingViolationSolutionProvider implements HasSolutionsForThrowable
             ->setDocumentationLinks([
                 'Read the docs on preventing lazy loading' => "https://laravel.com/docs/{$majorVersion}.x/eloquent-relationships#preventing-lazy-loading",
                 'Watch a video on how to deal with the N+1 problem' => 'https://www.youtube.com/watch?v=ZE7KBeraVpc',
-            ]),];
+            ]), ];
     }
 }

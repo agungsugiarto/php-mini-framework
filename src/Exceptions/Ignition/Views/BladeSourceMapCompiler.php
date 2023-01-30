@@ -16,7 +16,7 @@ class BladeSourceMapCompiler
 
     public function detectLineNumber(string $filename, int $compiledLineNumber): int
     {
-        $map = $this->compileSourcemap((string)file_get_contents($filename));
+        $map = $this->compileSourcemap((string) file_get_contents($filename));
 
         return $this->findClosestLineNumberMapping($map, $compiledLineNumber);
     }
@@ -114,7 +114,7 @@ class BladeSourceMapCompiler
     {
         $value = preg_replace('/^\|---LINE:([0-9]+)---\|$/m', '', $value);
 
-        return ltrim((string)$value, PHP_EOL);
+        return ltrim((string) $value, PHP_EOL);
     }
 
     protected function findClosestLineNumberMapping(string $map, int $compiledLineNumber): int
@@ -136,7 +136,7 @@ class BladeSourceMapCompiler
             }
 
             if (preg_match($pattern, $map[$lineNumberToCheck] ?? '', $matches)) {
-                return (int)$matches['line'];
+                return (int) $matches['line'];
             }
 
             $lineNumberToCheck--;

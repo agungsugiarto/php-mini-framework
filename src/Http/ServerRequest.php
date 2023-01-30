@@ -6,16 +6,16 @@ use Closure;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Macroable;
-use Psr\Http\Message\UriInterface;
-use Psr\Http\Message\StreamInterface;
-use Symfony\Component\HttpFoundation\InputBag;
-use Symfony\Component\HttpFoundation\ServerBag;
-use Symfony\Component\HttpFoundation\ParameterBag;
 use Laminas\Diactoros\Exception\InvalidArgumentException;
 use Laminas\Diactoros\ServerRequest as BaseServerRequest;
 use Mini\Framework\Http\Concerns\InteractsWithContentTypes;
 use Mini\Framework\Http\Concerns\InteractsWithFlashData;
 use Mini\Framework\Http\Concerns\InteractsWithInput;
+use Psr\Http\Message\StreamInterface;
+use Psr\Http\Message\UriInterface;
+use Symfony\Component\HttpFoundation\InputBag;
+use Symfony\Component\HttpFoundation\ParameterBag;
+use Symfony\Component\HttpFoundation\ServerBag;
 
 class ServerRequest extends BaseServerRequest
 {
@@ -67,17 +67,18 @@ class ServerRequest extends BaseServerRequest
     protected $routeResolver;
 
     /**
-     * @param array $serverParams Server parameters, typically from $_SERVER
-     * @param array $uploadedFiles Upload file information, a tree of UploadedFiles
-     * @param null|string|UriInterface $uri URI for the request, if any.
-     * @param null|string $method HTTP method for the request, if any.
-     * @param string|resource|StreamInterface $body Message body, if any.
-     * @param array $headers Headers for the message, if any.
-     * @param array $cookieParams Cookies for the message, if any.
-     * @param array $queryParams Query params for the message, if any.
-     * @param null|array|object $parsedBody The deserialized body parameters, if any.
-     * @param string $protocol HTTP protocol version.
-     * @throws InvalidArgumentException For any invalid value.
+     * @param array                           $serverParams  Server parameters, typically from $_SERVER
+     * @param array                           $uploadedFiles Upload file information, a tree of UploadedFiles
+     * @param string|UriInterface|null        $uri           URI for the request, if any
+     * @param string|null                     $method        HTTP method for the request, if any
+     * @param string|resource|StreamInterface $body          message body, if any
+     * @param array                           $headers       headers for the message, if any
+     * @param array                           $cookieParams  cookies for the message, if any
+     * @param array                           $queryParams   query params for the message, if any
+     * @param array|object|null               $parsedBody    the deserialized body parameters, if any
+     * @param string                          $protocol      HTTP protocol version
+     *
+     * @throws InvalidArgumentException for any invalid value
      */
     public function __construct(
         private array $serverParams = [],
@@ -143,8 +144,9 @@ class ServerRequest extends BaseServerRequest
     /**
      * Retrieve an input item from the request.
      *
-     * @param  string|null  $key
-     * @param  mixed  $default
+     * @param string|null $key
+     * @param mixed       $default
+     *
      * @return mixed
      */
     public function input($key = null, $default = null)
@@ -157,8 +159,9 @@ class ServerRequest extends BaseServerRequest
     /**
      * Get the JSON payload for the request.
      *
-     * @param  string|null  $key
-     * @param  mixed  $default
+     * @param string|null $key
+     * @param mixed       $default
+     *
      * @return \Symfony\Component\HttpFoundation\ParameterBag|mixed
      */
     public function json($key = null, $default = null)

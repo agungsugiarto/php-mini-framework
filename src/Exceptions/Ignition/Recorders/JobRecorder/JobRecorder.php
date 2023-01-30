@@ -2,19 +2,19 @@
 
 namespace Mini\Framework\Exceptions\Ignition\Recorders\JobRecorder;
 
-use Error;
 use DateTime;
+use Error;
 use Exception;
-use ReflectionClass;
-use RuntimeException;
-use ReflectionProperty;
+use Illuminate\Contracts\Encryption\Encrypter;
+use Illuminate\Contracts\Queue\Job;
+use Illuminate\Queue\CallQueuedClosure;
+use Illuminate\Queue\Events\JobExceptionOccurred;
+use Illuminate\Queue\Jobs\RedisJob;
 use Illuminate\Support\Str;
 use Mini\Framework\Application;
-use Illuminate\Contracts\Queue\Job;
-use Illuminate\Queue\Jobs\RedisJob;
-use Illuminate\Queue\CallQueuedClosure;
-use Illuminate\Contracts\Encryption\Encrypter;
-use Illuminate\Queue\Events\JobExceptionOccurred;
+use ReflectionClass;
+use ReflectionProperty;
+use RuntimeException;
 
 class JobRecorder
 {
@@ -28,7 +28,7 @@ class JobRecorder
 
     public function start(): self
     {
-        /** @phpstan-ignore-next-line */
+        /* @phpstan-ignore-next-line */
         $this->app['events']->listen(JobExceptionOccurred::class, [$this, 'record']);
 
         return $this;
@@ -130,9 +130,6 @@ class JobRecorder
 
     /**
      * @param array<string, mixed> $chainedCommands
-     * @param int $maxDepth
-     *
-     * @return array
      */
     protected function resolveJobChain(array $chainedCommands, int $maxDepth): array
     {
@@ -161,7 +158,7 @@ class JobRecorder
         }
 
         if ($this->app->bound(Encrypter::class)) {
-            /** @phpstan-ignore-next-line */
+            /* @phpstan-ignore-next-line */
             return unserialize($this->app[Encrypter::class]->decrypt($command));
         }
 

@@ -2,9 +2,9 @@
 
 namespace Mini\Framework\Exceptions\Ignition\Recorders\LogRecorder;
 
-use Throwable;
-use Mini\Framework\Application;
 use Illuminate\Log\Events\MessageLogged;
+use Mini\Framework\Application;
+use Throwable;
 
 class LogRecorder
 {
@@ -24,7 +24,7 @@ class LogRecorder
 
     public function start(): self
     {
-        /** @phpstan-ignore-next-line */
+        /* @phpstan-ignore-next-line */
         $this->app['events']->listen(MessageLogged::class, [$this, 'record']);
 
         return $this;

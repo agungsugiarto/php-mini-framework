@@ -2,8 +2,8 @@
 
 namespace Mini\Framework\Exceptions\Ignition\FlareMiddleware;
 
-use Spatie\FlareClient\Report;
 use Mini\Framework\Exceptions\Ignition\Recorders\QueryRecorder\QueryRecorder;
+use Spatie\FlareClient\Report;
 
 class AddQueries
 {

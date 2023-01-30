@@ -54,7 +54,7 @@ class FlareLogHandler extends AbstractProcessingHandler
             if ($this->hasValidLogLevel($record)) {
                 $this->flare->reportMessage(
                     $record['message'],
-                    'Log ' . Logger::getLevelName($record['level']),
+                    'Log '.Logger::getLevelName($record['level']),
                     function (Report $flareReport) use ($record) {
                         foreach ($record['context'] as $key => $value) {
                             $flareReport->context($key, $value);
@@ -67,8 +67,6 @@ class FlareLogHandler extends AbstractProcessingHandler
 
     /**
      * @param array<string, mixed> $report
-     *
-     * @return bool
      */
     protected function shouldReport(array $report): bool
     {
@@ -81,8 +79,6 @@ class FlareLogHandler extends AbstractProcessingHandler
 
     /**
      * @param array<string, mixed> $report
-     *
-     * @return bool
      */
     protected function hasException(array $report): bool
     {
@@ -93,8 +89,6 @@ class FlareLogHandler extends AbstractProcessingHandler
 
     /**
      * @param array<string, mixed> $report
-     *
-     * @return bool
      */
     protected function hasValidLogLevel(array $report): bool
     {

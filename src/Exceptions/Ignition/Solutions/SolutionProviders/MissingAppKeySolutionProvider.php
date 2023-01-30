@@ -2,9 +2,9 @@
 
 namespace Mini\Framework\Exceptions\Ignition\Solutions\SolutionProviders;
 
+use Mini\Framework\Exceptions\Ignition\Solutions\GenerateAppKeySolution;
 use RuntimeException;
 use Spatie\Ignition\Contracts\HasSolutionsForThrowable;
-use Mini\Framework\Exceptions\Ignition\Solutions\GenerateAppKeySolution;
 use Throwable;
 
 class MissingAppKeySolutionProvider implements HasSolutionsForThrowable

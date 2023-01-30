@@ -2,7 +2,6 @@
 
 namespace Mini\Framework\Exceptions\Ignition\Support\Composer;
 
-use function app_path;
 use function base_path;
 use Illuminate\Support\Str;
 use Symfony\Component\Finder\Finder;
@@ -101,7 +100,7 @@ class ComposerClassMap
                             $basename = basename($file->getRelativePathname(), '.php');
 
                             if ($basename === $missingClass) {
-                                return $namespace . basename($file->getRelativePathname(), '.php');
+                                return $namespace.basename($file->getRelativePathname(), '.php');
                             }
                         }
                     }
@@ -114,7 +113,7 @@ class ComposerClassMap
 
     protected function getFullyQualifiedClassNameFromFile(string $rootNamespace, SplFileInfo $file): string
     {
-        $class = trim(str_replace($this->basePath, '', (string)$file->getRealPath()), DIRECTORY_SEPARATOR);
+        $class = trim(str_replace($this->basePath, '', (string) $file->getRealPath()), DIRECTORY_SEPARATOR);
 
         $class = str_replace(
             [DIRECTORY_SEPARATOR, 'App\\'],
@@ -122,6 +121,6 @@ class ComposerClassMap
             ucfirst(Str::replaceLast('.php', '', $class))
         );
 
-        return $rootNamespace . $class;
+        return $rootNamespace.$class;
     }
 }

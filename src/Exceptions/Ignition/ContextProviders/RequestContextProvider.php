@@ -5,10 +5,10 @@ namespace Mini\Framework\Exceptions\Ignition\ContextProviders;
 use Laminas\Diactoros\UploadedFile;
 use Mini\Framework\Http\ServerRequestFactory;
 use Psr\Http\Message\ServerRequestInterface;
-use Throwable;
 use RuntimeException;
 use Spatie\FlareClient\Context\ContextProvider;
 use Symfony\Component\Mime\Exception\InvalidArgumentException;
+use Throwable;
 
 class RequestContextProvider implements ContextProvider
 {

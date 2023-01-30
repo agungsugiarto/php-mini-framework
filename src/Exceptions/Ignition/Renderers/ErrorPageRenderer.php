@@ -2,13 +2,13 @@
 
 namespace Mini\Framework\Exceptions\Ignition\Renderers;
 
+use Mini\Framework\Exceptions\Ignition\ContextProviders\LaravelContextProviderDetector;
+use Mini\Framework\Exceptions\Ignition\Solutions\SolutionTransformers\LaravelSolutionTransformer;
+use Mini\Framework\Exceptions\Ignition\Support\LaravelDocumentationLinkFinder;
 use Spatie\FlareClient\Flare;
 use Spatie\Ignition\Config\IgnitionConfig;
 use Spatie\Ignition\Contracts\SolutionProviderRepository;
 use Spatie\Ignition\Ignition;
-use Mini\Framework\Exceptions\Ignition\ContextProviders\LaravelContextProviderDetector;
-use Mini\Framework\Exceptions\Ignition\Solutions\SolutionTransformers\LaravelSolutionTransformer;
-use Mini\Framework\Exceptions\Ignition\Support\LaravelDocumentationLinkFinder;
 use Throwable;
 
 class ErrorPageRenderer

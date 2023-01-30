@@ -3,10 +3,10 @@
 namespace Mini\Framework\Exceptions\Ignition\Solutions\SolutionProviders;
 
 use Illuminate\Support\Str;
-use Spatie\Ignition\Contracts\BaseSolution;
-use Spatie\Ignition\Contracts\HasSolutionsForThrowable;
 use Mini\Framework\Exceptions\Ignition\Support\Composer\ComposerClassMap;
 use Mini\Framework\Exceptions\Ignition\Support\StringComparator;
+use Spatie\Ignition\Contracts\BaseSolution;
+use Spatie\Ignition\Contracts\HasSolutionsForThrowable;
 use Throwable;
 use UnexpectedValueException;
 

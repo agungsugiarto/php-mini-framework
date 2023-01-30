@@ -3,8 +3,8 @@
 namespace Mini\Framework\Exceptions\Ignition\Http\Requests;
 
 use Mini\Framework\Http\FormRequest;
-use Spatie\Ignition\Contracts\Solution;
 use Spatie\Ignition\Contracts\RunnableSolution;
+use Spatie\Ignition\Contracts\Solution;
 use Spatie\Ignition\Contracts\SolutionProviderRepository;
 
 class ExecuteSolutionRequest extends FormRequest

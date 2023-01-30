@@ -3,9 +3,9 @@
 namespace Mini\Framework\Exceptions\Ignition\FlareMiddleware;
 
 use Closure;
+use Mini\Framework\Exceptions\Ignition\Recorders\DumpRecorder\DumpRecorder;
 use Spatie\FlareClient\FlareMiddleware\FlareMiddleware;
 use Spatie\FlareClient\Report;
-use Mini\Framework\Exceptions\Ignition\Recorders\DumpRecorder\DumpRecorder;
 
 class AddDumps implements FlareMiddleware
 {

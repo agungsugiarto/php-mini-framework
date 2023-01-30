@@ -3,8 +3,8 @@
 namespace Mini\Framework\Exceptions\Ignition\Solutions\SolutionProviders;
 
 use Illuminate\Database\QueryException;
-use Spatie\Ignition\Contracts\HasSolutionsForThrowable;
 use Mini\Framework\Exceptions\Ignition\Solutions\SuggestUsingCorrectDbNameSolution;
+use Spatie\Ignition\Contracts\HasSolutionsForThrowable;
 use Throwable;
 
 class DefaultDbNameSolutionProvider implements HasSolutionsForThrowable

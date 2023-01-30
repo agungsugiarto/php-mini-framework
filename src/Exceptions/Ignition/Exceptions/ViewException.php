@@ -3,8 +3,8 @@
 namespace Mini\Framework\Exceptions\Ignition\Exceptions;
 
 use ErrorException;
-use Spatie\FlareClient\Contracts\ProvidesFlareContext;
 use Mini\Framework\Exceptions\Ignition\Recorders\DumpRecorder\HtmlDumper;
+use Spatie\FlareClient\Contracts\ProvidesFlareContext;
 
 class ViewException extends ErrorException implements ProvidesFlareContext
 {
@@ -15,8 +15,6 @@ class ViewException extends ErrorException implements ProvidesFlareContext
 
     /**
      * @param array<string, mixed> $data
-     *
-     * @return void
      */
     public function setViewData(array $data): void
     {
