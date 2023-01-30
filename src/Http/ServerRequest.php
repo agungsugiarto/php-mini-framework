@@ -126,7 +126,7 @@ class ServerRequest extends BaseServerRequest
      */
     public function get(string $key, $default = null)
     {
-        if ($result = $this->getAttribute($key)) {
+        if ($this !== $result = $this->getAttribute($key, $this)) {
             return $result;
         }
 
