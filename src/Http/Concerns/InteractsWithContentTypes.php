@@ -28,7 +28,7 @@ trait InteractsWithContentTypes
      */
     public function isXmlHttpRequest()
     {
-        return 'XMLHttpRequest' == $this->headers->get('X-Requested-With');
+        return 'XMLHttpRequest' == $this->getHeaderLine('X-Requested-With');
     }
 
     /**
@@ -48,6 +48,6 @@ trait InteractsWithContentTypes
      */
     public function pjax()
     {
-        return $this->headers->get('X-PJAX') == true;
+        return $this->getHeaderLine('X-PJAX') == true;
     }
 }

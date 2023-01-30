@@ -55,12 +55,10 @@ class IgnitionServiceProvider extends ServiceProvider
     {
         if ($this->app->runningInConsole()) {
             $this->registerCommands();
-            $this->publishConfigs();
         }
 
         $this->registerRoutes();
         $this->configureTinker();
-        $this->configureOctane();
         $this->registerViewExceptionMapper();
         $this->startRecorders();
         $this->configureQueue();
@@ -86,17 +84,6 @@ class IgnitionServiceProvider extends ServiceProvider
                 SolutionProviderMakeCommand::class,
             ]);
         }
-    }
-
-    protected function publishConfigs(): void
-    {
-        $this->publishes([
-            __DIR__.'/../config/ignition.php' => config_path('ignition.php'),
-        ], 'ignition-config');
-
-        $this->publishes([
-            __DIR__.'/../config/flare.php' => config_path('flare.php'),
-        ], 'flare-config');
     }
 
     protected function registerRenderer(): void
@@ -193,13 +180,6 @@ class IgnitionServiceProvider extends ServiceProvider
             if (isset($_SERVER['argv']) && ['artisan', 'tinker'] === $_SERVER['argv']) {
                 app(Flare::class)->sendReportsImmediately();
             }
-        }
-    }
-
-    protected function configureOctane(): void
-    {
-        if (isset($_SERVER['LARAVEL_OCTANE'])) {
-            $this->setupOctane();
         }
     }
 
@@ -319,25 +299,6 @@ class IgnitionServiceProvider extends ServiceProvider
                 fn (string $class) => in_array($class, config('ignition.ignored_solution_providers'))
             )
             ->toArray();
-    }
-
-    protected function setupOctane(): void
-    {
-        $this->app['events']->listen(RequestReceived::class, function () {
-            $this->resetFlareAndLaravelIgnition();
-        });
-
-        $this->app['events']->listen(TaskReceived::class, function () {
-            $this->resetFlareAndLaravelIgnition();
-        });
-
-        $this->app['events']->listen(TickReceived::class, function () {
-            $this->resetFlareAndLaravelIgnition();
-        });
-
-        $this->app['events']->listen(RequestTerminated::class, function () {
-            $this->resetFlareAndLaravelIgnition();
-        });
     }
 
     protected function resetFlareAndLaravelIgnition(): void
