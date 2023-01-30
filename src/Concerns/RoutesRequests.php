@@ -20,6 +20,7 @@ use Laminas\HttpHandlerRunner\Emitter\SapiEmitter;
 use Mini\Framework\Exceptions\HttpResponseException;
 use Mini\Framework\Exceptions\MethodNotAllowedHttpException;
 use Mini\Framework\Exceptions\NotFoundHttpException;
+use Mini\Framework\Http\ServerRequest;
 use Mini\Framework\Http\ServerRequestFactory;
 use Mini\Framework\Routing\Controller;
 use Mini\Framework\Routing\Pipeline;
@@ -150,6 +151,7 @@ trait RoutesRequests
             return $this->sendThroughPipeline($this->middleware, function ($request) use ($method, $pathInfo) {
                 $this->instance(RequestInterface::class, $request);
                 $this->instance(ServerRequestInterface::class, $request);
+                $this->instance(ServerRequest::class, $request);
 
                 if (isset($this->router->getRoutes()[$method.$pathInfo])) {
                     return $this->handleFoundRoute([true, $this->router->getRoutes()[$method.$pathInfo]['action'], []]);
@@ -173,6 +175,7 @@ trait RoutesRequests
     {
         $this->instance(RequestInterface::class, $request);
         $this->instance(ServerRequestInterface::class, $request);
+        $this->instance(ServerRequest::class, $request);
 
         return [$request->getMethod(), '/'.trim($request->getUri()->getPath(), '/')];
     }

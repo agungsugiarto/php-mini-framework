@@ -9,8 +9,30 @@ use Laminas\Diactoros\Exception\UnrecognizedProtocolVersionException;
 use Laminas\Diactoros\Response\RedirectResponse;
 use Laminas\Diactoros\UploadedFile;
 use Mini\Framework\Bus\PendingDispatch;
+use Mini\Framework\Exceptions\Ignition\Renderers\ErrorPageRenderer;
 use Mini\Framework\Http\Redirector;
 use Psr\Http\Message\UploadedFileInterface;
+
+if (! function_exists('ddd')) {
+    function ddd()
+    {
+        $args = func_get_args();
+
+        if (count($args) === 0) {
+            throw new Exception('You should pass at least 1 argument to `ddd`');
+        }
+
+        call_user_func_array('dump', $args);
+
+        $renderer = app()->make(ErrorPageRenderer::class);
+
+        $exception = new Exception('Dump, Die, Debug');
+
+        $renderer->render($exception);
+
+        exit();
+    }
+}
 
 if (! function_exists('abort')) {
     /**
@@ -21,12 +43,54 @@ if (! function_exists('abort')) {
      *
      * @return void
      *
-     * @throws \League\Route\Http\Exception
-     * @throws \League\Route\Http\Exception\NotFoundException
+     * @throws \Mini\Framework\Exceptions\HttpException
+     * @throws \Mini\Framework\Exceptions\NotFoundException
      */
     function abort($code, $message = '', array $headers = [])
     {
         app()->abort($code, $message, $headers);
+    }
+}
+
+if (! function_exists('abort_if')) {
+    /**
+     * Throw an HttpException with the given data if the given condition is true.
+     *
+     * @param bool   $boolean
+     * @param int    $code
+     * @param string $message
+     *
+     * @return void
+     *
+     * @throws \Mini\Framework\Exceptions\HttpException
+     * @throws \Mini\Framework\Exceptions\NotFoundException
+     */
+    function abort_if($boolean, $code, $message = '', array $headers = [])
+    {
+        if ($boolean) {
+            abort($code, $message, $headers);
+        }
+    }
+}
+
+if (! function_exists('abort_unless')) {
+    /**
+     * Throw an HttpException with the given data unless the given condition is true.
+     *
+     * @param bool   $boolean
+     * @param int    $code
+     * @param string $message
+     *
+     * @return void
+     *
+     * @throws \Mini\Framework\Exceptions\HttpException
+     * @throws \Mini\Framework\Exceptions\NotFoundException
+     */
+    function abort_unless($boolean, $code, $message = '', array $headers = [])
+    {
+        if (! $boolean) {
+            abort($code, $message, $headers);
+        }
     }
 }
 
