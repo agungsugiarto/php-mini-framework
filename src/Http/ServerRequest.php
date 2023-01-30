@@ -89,7 +89,7 @@ class ServerRequest extends BaseServerRequest
         array $headers = [],
         private array $cookieParams = [],
         private array $queryParams = [],
-        private $parsedBody = null,
+        private $parsedBody = [],
         string $protocol = '1.1'
     ) {
         parent::__construct(
