@@ -165,7 +165,7 @@ class Handler implements ExceptionHandler
     protected function prepareResponse($request, Throwable $e)
     {
         $response = new HtmlResponse(
-            $this->renderExceptionContent($e),
+            $this->renderExceptionContent($e, config('app.debug', false)),
             $this->isHttpException($e) ? $e->getStatusCode() : 500,
             $this->isHttpException($e) ? $e->getHeaders() : []
         );
@@ -180,14 +180,14 @@ class Handler implements ExceptionHandler
      *
      * @return string
      */
-    protected function renderExceptionContent(Throwable $e)
+    protected function renderExceptionContent(Throwable $e, bool $debug)
     {
         try {
-            return config('app.debug') && app()->has(ExceptionRenderer::class)
+            return $debug && app()->has(ExceptionRenderer::class)
                 ? $this->renderExceptionWithCustomRenderer($e)
-                : $this->renderExceptionWithSymfony($e, config('app.debug'));
+                : $this->renderExceptionWithSymfony($e, $debug);
         } catch (Throwable $e) {
-            return $this->renderExceptionWithSymfony($e, config('app.debug'));
+            return $this->renderExceptionWithSymfony($e, $debug);
         }
     }
 
