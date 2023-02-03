@@ -3,20 +3,19 @@
 namespace Mini\Framework\Exceptions;
 
 use Exception;
-use Illuminate\Console\View\Components\BulletList;
-use Illuminate\Console\View\Components\Error;
-use Illuminate\Contracts\Debug\ExceptionHandler;
-use Illuminate\Contracts\Foundation\ExceptionRenderer;
-use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Throwable;
 use Illuminate\Support\Arr;
-use Illuminate\Validation\ValidationException;
+use Psr\Log\LoggerInterface;
 use Laminas\Diactoros\Response\HtmlResponse;
 use Laminas\Diactoros\Response\JsonResponse;
-use Psr\Log\LoggerInterface;
+use Illuminate\Console\View\Components\Error;
+use Illuminate\Validation\ValidationException;
+use Illuminate\Contracts\Debug\ExceptionHandler;
+use Illuminate\Console\View\Components\BulletList;
+use Illuminate\Contracts\Foundation\ExceptionRenderer;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Symfony\Component\Console\Application as ConsoleApplication;
 use Symfony\Component\Console\Exception\CommandNotFoundException;
-use Symfony\Component\ErrorHandler\ErrorRenderer\HtmlErrorRenderer;
-use Throwable;
 
 class Handler implements ExceptionHandler
 {
@@ -103,7 +102,9 @@ class Handler implements ExceptionHandler
             return $e->render($request);
         }
 
-        if ($e instanceof ModelNotFoundException) {
+        if ($e instanceof HttpResponseException) {
+            return $e->getResponse();
+        } elseif ($e instanceof ModelNotFoundException) {
             $e = new NotFoundHttpException($e->getMessage(), $e);
         } elseif ($e instanceof ValidationException && $e->getResponse()) {
             return $e->getResponse();

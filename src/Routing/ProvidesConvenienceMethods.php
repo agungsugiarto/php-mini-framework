@@ -76,11 +76,7 @@ trait ProvidesConvenienceMethods
      */
     protected function extractInputFromRules(ServerRequestInterface $request, array $rules)
     {
-        return collect(array_merge(
-            $request->getQueryParams(),
-            $request->getParsedBody(),
-            $request->getUploadedFiles()
-        ))->only(collect($rules)->keys()->map(function ($rule) {
+        return $request->only(collect($rules)->keys()->map(function ($rule) {
             return Str::contains($rule, '.') ? explode('.', $rule)[0] : $rule;
         })->unique()->toArray());
     }

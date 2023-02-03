@@ -115,7 +115,7 @@ class Application extends Container implements RequestHandlerInterface
     protected $terminatingCallbacks = [];
 
     /**
-     * Create a new Lumen application instance.
+     * Create a new Mini application instance.
      *
      * @param string|null $basePath
      *

@@ -37,7 +37,7 @@ class Router
     /**
      * Router constructor.
      *
-     * @param \Laravel\Lumen\Application $app
+     * @param \Mini\Framework\Application $app
      */
     public function __construct($app)
     {
