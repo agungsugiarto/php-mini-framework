@@ -4,8 +4,8 @@ namespace Mini\Framework\Exceptions;
 
 use Symfony\Component\ErrorHandler\ErrorRenderer\ErrorRendererInterface;
 use Symfony\Component\ErrorHandler\ErrorRenderer\HtmlErrorRenderer as BaseHtmlErrorRenderer;
-use Throwable;
 use Symfony\Component\ErrorHandler\Exception\FlattenException;
+use Throwable;
 
 class HtmlErrorRenderer implements ErrorRendererInterface
 {

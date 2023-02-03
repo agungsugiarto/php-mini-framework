@@ -3,19 +3,19 @@
 namespace Mini\Framework\Exceptions;
 
 use Exception;
-use Throwable;
-use Illuminate\Support\Arr;
-use Psr\Log\LoggerInterface;
-use Laminas\Diactoros\Response\HtmlResponse;
-use Laminas\Diactoros\Response\JsonResponse;
-use Illuminate\Console\View\Components\Error;
-use Illuminate\Validation\ValidationException;
-use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Console\View\Components\BulletList;
+use Illuminate\Console\View\Components\Error;
+use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Contracts\Foundation\ExceptionRenderer;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Support\Arr;
+use Illuminate\Validation\ValidationException;
+use Laminas\Diactoros\Response\HtmlResponse;
+use Laminas\Diactoros\Response\JsonResponse;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Application as ConsoleApplication;
 use Symfony\Component\Console\Exception\CommandNotFoundException;
+use Throwable;
 
 class Handler implements ExceptionHandler
 {
