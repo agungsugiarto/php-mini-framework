@@ -2,10 +2,9 @@
 
 namespace Mini\Framework\Validation;
 
-use Mini\Framework\Validation\Factory;
+use Illuminate\Contracts\Support\DeferrableProvider;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Validation\DatabasePresenceVerifier;
-use Illuminate\Contracts\Support\DeferrableProvider;
 
 class ValidationServiceProvider extends ServiceProvider implements DeferrableProvider
 {

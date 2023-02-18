@@ -2,7 +2,6 @@
 
 namespace Mini\Framework\Validation;
 
-use Mini\Framework\Validation\Validator;
 use Illuminate\Validation\Factory as BaseFactory;
 
 class Factory extends BaseFactory
