@@ -4,7 +4,7 @@ namespace Mini\Framework\Http\Concerns;
 
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Date;
-use SplFileInfo;
+use Psr\Http\Message\UploadedFileInterface;
 use stdClass;
 use Symfony\Component\VarDumper\VarDumper;
 
@@ -443,7 +443,7 @@ trait InteractsWithInput
      */
     protected function isValidFile($file)
     {
-        return $file instanceof SplFileInfo && $file->getPath() !== '';
+        return $file instanceof UploadedFileInterface && $file->getStream()->getMetadata('uri') !== '';
     }
 
     /**
