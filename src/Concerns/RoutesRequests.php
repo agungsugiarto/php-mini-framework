@@ -148,7 +148,7 @@ trait RoutesRequests
         try {
             $this->boot();
 
-            return $this->sendThroughPipeline($this->middleware, function ($request) use ($method, $pathInfo) {
+            return $this->sendThroughPipeline($this->middleware, function (ServerRequestInterface $request) use ($method, $pathInfo) {
                 $this->instance(RequestInterface::class, $request);
                 $this->instance(ServerRequestInterface::class, $request);
                 $this->instance(ServerRequest::class, $request);

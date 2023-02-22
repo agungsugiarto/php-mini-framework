@@ -4,15 +4,18 @@ namespace Mini\Framework\Testing\Concerns;
 
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
+use Laminas\Diactoros\UriFactory;
 use Illuminate\Testing\Assert as PHPUnit;
-use Illuminate\Testing\TestResponse;
+use Illuminate\Testing\AssertableJsonString;
+use Psr\Http\Message\ServerRequestInterface;
+use Mini\Framework\Http\ServerRequestFactory;
 
 trait MakesHttpRequests
 {
     /**
      * The last response returned by the application.
      *
-     * @var \Illuminate\Testing\TestResponse
+     * @var \Psr\Http\Message\ResponseInterface
      */
     protected $response;
 
@@ -165,17 +168,15 @@ trait MakesHttpRequests
      *
      * This method allows you to fully customize the entire Request object.
      *
-     * @param \Illuminate\Http\Request $request
+     * @param \Psr\Http\Message\ServerRequestInterface $request
      *
      * @return $this
      */
-    public function handle(Request $request)
+    public function handle(ServerRequestInterface $request)
     {
-        $this->currentUri = $request->fullUrl();
+        $this->currentUri = $request->getUri()->getPath();
 
-        $this->response = TestResponse::fromBaseResponse(
-            $this->app->prepareResponse($this->app->handle($request))
-        );
+        $this->response = $this->app->prepareResponse($this->app->handle($request));
 
         return $this;
     }
@@ -210,7 +211,7 @@ trait MakesHttpRequests
     public function seeJsonEquals(array $data)
     {
         $actual = json_encode(Arr::sortRecursive(
-            json_decode($this->response->getContent(), true)
+            json_decode($this->response->getBody()->getContents(), true)
         ));
 
         $data = json_encode(Arr::sortRecursive(
@@ -232,7 +233,7 @@ trait MakesHttpRequests
     public function seeJson(array $data = null, $negate = false)
     {
         if (is_null($data)) {
-            $decodedResponse = json_decode($this->response->getContent(), true);
+            $decodedResponse = json_decode($this->response->getBody()->getContents(), true);
 
             if (is_null($decodedResponse) || $decodedResponse === false) {
                 PHPUnit::fail(
@@ -265,9 +266,47 @@ trait MakesHttpRequests
      */
     public function seeJsonStructure(array $structure = null, $responseData = null)
     {
-        $this->response->assertJsonStructure($structure, $responseData);
+        $this->assertJsonStructure($structure, $responseData);
 
         return $this;
+    }
+
+    /**
+     * Assert that the response has a given JSON structure.
+     *
+     * @param  array|null  $structure
+     * @param  array|null  $responseData
+     * @return $this
+     */
+    public function assertJsonStructure(array $structure = null, $responseData = null)
+    {
+        $this->decodeResponseJson()->assertStructure($structure, $responseData);
+
+        return $this;
+    }
+
+    /**
+     * Validate and return the decoded response JSON.
+     *
+     * @return \Illuminate\Testing\AssertableJsonString
+     *
+     * @throws \Throwable
+     */
+    public function decodeResponseJson()
+    {
+        $testJson = new AssertableJsonString($this->response->getBody()->getContents());
+
+        $decodedResponse = $testJson->json();
+
+        if (is_null($decodedResponse) || $decodedResponse === false) {
+            if ($this->exception) {
+                throw $this->exception;
+            } else {
+                PHPUnit::fail('Invalid JSON was returned from the route.');
+            }
+        }
+
+        return $testJson;
     }
 
     /**
@@ -280,10 +319,37 @@ trait MakesHttpRequests
     protected function seeJsonContains(array $data, $negate = false)
     {
         if ($negate) {
-            $this->response->assertJsonMissing($data, false);
+            $this->assertJsonMissing($data, false);
         } else {
-            $this->response->assertJsonFragment($data);
+            $this->assertJsonFragment($data);
         }
+
+        return $this;
+    }
+
+    /**
+     * Assert that the response does not contain the given JSON fragment.
+     *
+     * @param  array  $data
+     * @param  bool  $exact
+     * @return $this
+     */
+    public function assertJsonMissing(array $data, $exact = false)
+    {
+        $this->decodeResponseJson()->assertMissing($data, $exact);
+
+        return $this;
+    }
+
+    /**
+     * Assert that the response contains the given JSON fragment.
+     *
+     * @param  array  $data
+     * @return $this
+     */
+    public function assertJsonFragment(array $data)
+    {
+        $this->decodeResponseJson()->assertFragment($data);
 
         return $this;
     }
@@ -295,7 +361,7 @@ trait MakesHttpRequests
      */
     protected function seeJsonDoesntContains(array $data)
     {
-        $this->response->assertJsonMissing($data, false);
+        $this->assertJsonMissing($data, false);
 
         return $this;
     }
@@ -340,16 +406,17 @@ trait MakesHttpRequests
     {
         $this->currentUri = $this->prepareUrlForRequest($uri);
 
-        $symfonyRequest = SymfonyRequest::create(
-            $this->currentUri, $method, $parameters,
-            $cookies, $files, $server, $content
-        );
+        $this->app['request'] = ServerRequestFactory::fromGlobals(
+            $server,
+            $parameters,
+            $content,
+            $cookies,
+            $files
+        )
+        ->withMethod($method)
+        ->withUri((new UriFactory)->createUri($uri));
 
-        $this->app['request'] = LumenRequest::createFromBase($symfonyRequest);
-
-        return $this->response = TestResponse::fromBaseResponse(
-            $this->app->prepareResponse($this->app->handle($this->app['request']))
-        );
+        return $this->response = $this->app->prepareResponse($this->app->handle($this->app['request']));
     }
 
     /**
@@ -402,7 +469,7 @@ trait MakesHttpRequests
      */
     public function assertResponseOk()
     {
-        $this->response->assertOk();
+        $this->assertStatus(200);
     }
 
     /**
@@ -414,7 +481,7 @@ trait MakesHttpRequests
      */
     public function assertResponseStatus($status)
     {
-        $this->response->assertStatus($status);
+        $this->assertStatus($status);
     }
 
     /**
@@ -441,9 +508,61 @@ trait MakesHttpRequests
      */
     protected function seeHeader($headerName, $value = null)
     {
-        $this->response->assertHeader($headerName, $value);
+        $this->assertHeader($headerName, $value);
 
         return $this;
+    }
+
+    /**
+     * Asserts that the response contains the given header and equals the optional value.
+     *
+     * @param  string  $headerName
+     * @param  mixed  $value
+     * @return $this
+     */
+    public function assertHeader($headerName, $value = null)
+    {
+        PHPUnit::assertTrue(
+            $this->response->hasHeader($headerName), "Header [{$headerName}] not present on response."
+        );
+
+        $actual = $this->response->getHeaderLine($headerName);
+
+        if (! is_null($value)) {
+            PHPUnit::assertEquals(
+                $value, $this->response->getHeaderLine($headerName),
+                "Header [{$headerName}] was found, but value [{$actual}] does not match [{$value}]."
+            );
+        }
+
+        return $this;
+    }
+
+    /**
+     * Assert that the response has the given status code.
+     *
+     * @param  int  $status
+     * @return $this
+     */
+    public function assertStatus($status)
+    {
+        $message = $this->statusMessageWithDetails($status, $actual = $this->response->getStatusCode());
+
+        PHPUnit::assertSame($actual, $status, $message);
+
+        return $this;
+    }
+
+    /**
+     * Get an assertion message for a status assertion containing extra details when available.
+     *
+     * @param  string|int  $expected
+     * @param  string|int  $actual
+     * @return string
+     */
+    protected function statusMessageWithDetails($expected, $actual)
+    {
+        return "Expected response status code [{$expected}] but received {$actual}.";
     }
 
     /**

@@ -40,7 +40,7 @@ abstract class TestCase extends BaseTestCase
      *
      * Needs to be implemented by subclasses.
      *
-     * @return \Symfony\Component\HttpKernel\HttpKernelInterface
+     * @return \Mini\Framework\Application
      */
     abstract public function createApplication();
 
