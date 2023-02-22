@@ -4,11 +4,11 @@ namespace Mini\Framework\Testing\Concerns;
 
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
-use Laminas\Diactoros\UriFactory;
 use Illuminate\Testing\Assert as PHPUnit;
 use Illuminate\Testing\AssertableJsonString;
-use Psr\Http\Message\ServerRequestInterface;
+use Laminas\Diactoros\UriFactory;
 use Mini\Framework\Http\ServerRequestFactory;
+use Psr\Http\Message\ServerRequestInterface;
 
 trait MakesHttpRequests
 {
@@ -168,8 +168,6 @@ trait MakesHttpRequests
      *
      * This method allows you to fully customize the entire Request object.
      *
-     * @param \Psr\Http\Message\ServerRequestInterface $request
-     *
      * @return $this
      */
     public function handle(ServerRequestInterface $request)
@@ -274,8 +272,8 @@ trait MakesHttpRequests
     /**
      * Assert that the response has a given JSON structure.
      *
-     * @param  array|null  $structure
-     * @param  array|null  $responseData
+     * @param array|null $responseData
+     *
      * @return $this
      */
     public function assertJsonStructure(array $structure = null, $responseData = null)
@@ -330,8 +328,8 @@ trait MakesHttpRequests
     /**
      * Assert that the response does not contain the given JSON fragment.
      *
-     * @param  array  $data
-     * @param  bool  $exact
+     * @param bool $exact
+     *
      * @return $this
      */
     public function assertJsonMissing(array $data, $exact = false)
@@ -344,7 +342,6 @@ trait MakesHttpRequests
     /**
      * Assert that the response contains the given JSON fragment.
      *
-     * @param  array  $data
      * @return $this
      */
     public function assertJsonFragment(array $data)
@@ -516,8 +513,9 @@ trait MakesHttpRequests
     /**
      * Asserts that the response contains the given header and equals the optional value.
      *
-     * @param  string  $headerName
-     * @param  mixed  $value
+     * @param string $headerName
+     * @param mixed  $value
+     *
      * @return $this
      */
     public function assertHeader($headerName, $value = null)
@@ -541,7 +539,8 @@ trait MakesHttpRequests
     /**
      * Assert that the response has the given status code.
      *
-     * @param  int  $status
+     * @param int $status
+     *
      * @return $this
      */
     public function assertStatus($status)
@@ -556,8 +555,9 @@ trait MakesHttpRequests
     /**
      * Get an assertion message for a status assertion containing extra details when available.
      *
-     * @param  string|int  $expected
-     * @param  string|int  $actual
+     * @param string|int $expected
+     * @param string|int $actual
+     *
      * @return string
      */
     protected function statusMessageWithDetails($expected, $actual)
