@@ -11,17 +11,11 @@ use Symfony\Component\VarDumper\VarDumper;
 trait InteractsWithInput
 {
     /**
-     * Retrieve a server variable from the request.
+     * The decoded JSON content for the request.
      *
-     * @param string|null       $key
-     * @param string|array|null $default
-     *
-     * @return string|array|null
+     * @var array|null
      */
-    public function server($key = null, $default = null)
-    {
-        return $this->retrieveItem('server', $key, $default);
-    }
+    protected $json;
 
     /**
      * Get the bearer token from the request headers.
@@ -230,45 +224,6 @@ trait InteractsWithInput
     }
 
     /**
-     * Get all of the input and files for the request.
-     *
-     * @param array|mixed|null $keys
-     *
-     * @return array
-     */
-    public function all($keys = null)
-    {
-        $input = array_replace_recursive($this->input(), $this->getUploadedFiles());
-
-        if (! $keys) {
-            return $input;
-        }
-
-        $results = [];
-
-        foreach (is_array($keys) ? $keys : func_get_args() as $key) {
-            Arr::set($results, $key, Arr::get($input, $key));
-        }
-
-        return $results;
-    }
-
-    /**
-     * Retrieve an input item from the request.
-     *
-     * @param string|null $key
-     * @param mixed       $default
-     *
-     * @return mixed
-     */
-    public function input($key = null, $default = null)
-    {
-        return data_get(
-            $this->getInputSource()->all() + $this->query->all(), $key, $default
-        );
-    }
-
-    /**
      * Retrieve input as a boolean value.
      *
      * Returns true when value is "1", "true", "on", and "yes". Otherwise, returns false.
@@ -362,16 +317,33 @@ trait InteractsWithInput
     }
 
     /**
-     * Retrieve a query string item from the request.
+     * Gets a "parameter" value from any bag.
      *
-     * @param string|null       $key
-     * @param string|array|null $default
+     * This method is mainly useful for libraries that want to provide some flexibility. If you don't need the
+     * flexibility in controllers, it is better to explicitly get request parameters from the appropriate
+     * public property instead (attributes, query, request).
      *
-     * @return string|array|null
+     * Order of precedence: PATH (routing placeholders or custom attributes), GET, POST
+     *
+     * @param mixed $default The default value if the parameter key does not exist
+     *
+     * @return mixed
      */
-    public function query($key = null, $default = null)
+    public function get(string $key, $default = null)
     {
-        return $this->retrieveItem('query', $key, $default);
+        if ($this !== $result = $this->getAttribute($key, $this)) {
+            return $result;
+        }
+
+        if ($query = $this->query($key)) {
+            return $query;
+        }
+
+        if ($post = $this->post($key)) {
+            return $post;
+        }
+
+        return $default;
     }
 
     /**
@@ -384,7 +356,80 @@ trait InteractsWithInput
      */
     public function post($key = null, $default = null)
     {
-        return $this->retrieveItem('request', $key, $default);
+        return $this->retrieveItem('getParsedBody', $key, $default);
+    }
+
+    /**
+     * Retrieve an input item from the request.
+     *
+     * @param string|null $key
+     * @param mixed       $default
+     *
+     * @return mixed
+     */
+    public function input($key = null, $default = null)
+    {
+        return data_get(
+            $this->getInputSource() + $this->query(), $key, $default
+        );
+    }
+
+    /**
+     * Get the JSON payload for the request.
+     *
+     * @param string|null $key
+     * @param mixed       $default
+     *
+     * @return array|mixed
+     */
+    public function json($key = null, $default = null)
+    {
+        if (! isset($this->json)) {
+            $this->json = (array) json_decode($this->getBody()->getContents(), true);
+        }
+
+        if (is_null($key)) {
+            return $this->json;
+        }
+
+        return data_get($this->json, $key, $default);
+    }
+
+    /**
+     * Get all of the input and files for the request.
+     *
+     * @param array|mixed|null $keys
+     *
+     * @return array
+     */
+    public function all($keys = null)
+    {
+        $input = array_replace_recursive($this->input(), $this->getUploadedFiles());
+
+        if (! $keys) {
+            return $input;
+        }
+
+        $results = [];
+
+        foreach (is_array($keys) ? $keys : func_get_args() as $key) {
+            Arr::set($results, $key, Arr::get($input, $key));
+        }
+
+        return $results;
+    }
+
+    /**
+     * Retrieve a query string item from the request.
+     *
+     * @param string|null       $key
+     * @param string|array|null $default
+     *
+     * @return string|array|null
+     */
+    public function query($key = null, $default = null)
+    {
+        return $this->retrieveItem('getQueryParams', $key, $default);
     }
 
     /**
@@ -409,7 +454,20 @@ trait InteractsWithInput
      */
     public function cookie($key = null, $default = null)
     {
-        return $this->retrieveItem('cookies', $key, $default);
+        return $this->retrieveItem('getCookieParams', $key, $default);
+    }
+
+    /**
+     * Retrieve a server variable from the request.
+     *
+     * @param string|null       $key
+     * @param string|array|null $default
+     *
+     * @return string|array|null
+     */
+    public function server($key = null, $default = null)
+    {
+        return $this->retrieveItem('getServerParams', $key, $default);
     }
 
     /**
@@ -462,7 +520,7 @@ trait InteractsWithInput
     /**
      * Retrieve a parameter item from a given source.
      *
-     * @param string            $source
+     * @param string            $source The source is getServerParams, getCookieParams, getQueryParams and getParsedBody.
      * @param string            $key
      * @param string|array|null $default
      *
@@ -470,11 +528,25 @@ trait InteractsWithInput
      */
     protected function retrieveItem($source, $key, $default)
     {
-        if (is_null($key)) {
-            return $this->$source->all();
+        if (is_null($key) && method_exists($this, $source)) {
+            return $this->{$source}();
         }
 
-        return $this->$source->get($key, $default);
+        return \array_key_exists($key, $this->{$source}()) ? $this->{$source}()[$key] : $default;
+    }
+
+    /**
+     * Get the input source for the request.
+     *
+     * @return array
+     */
+    protected function getInputSource()
+    {
+        if ($this->isJson()) {
+            return $this->json();
+        }
+
+        return in_array($this->getMethod(), ['GET', 'HEAD']) ? $this->query() : $this->post();
     }
 
     /**

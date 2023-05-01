@@ -110,7 +110,7 @@ class Handler implements ExceptionHandler
             return $e->getResponse();
         }
 
-        return in_array('XMLHttpRequest', $request->getHeader('X-Requested-With'))
+        return $request->isJson() || $request->ajax()
             ? $this->prepareJsonResponse($request, $e)
             : $this->prepareResponse($request, $e);
     }
