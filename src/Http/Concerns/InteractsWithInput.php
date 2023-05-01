@@ -520,7 +520,7 @@ trait InteractsWithInput
     /**
      * Retrieve a parameter item from a given source.
      *
-     * @param string            $source The source is getServerParams, getCookieParams, getQueryParams and getParsedBody.
+     * @param string            $source  the source is getServerParams, getCookieParams, getQueryParams and getParsedBody
      * @param string            $key
      * @param string|array|null $default
      *
