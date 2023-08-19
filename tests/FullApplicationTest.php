@@ -29,7 +29,7 @@ class FullApplicationTest extends TestCase
         $app = new Application;
 
         $app->router->get('/', function () {
-            return new TextResponse('Hello World');
+            return 'Hello World';
         });
 
         $response = $app->handle($request = (new ServerRequestFactory)->createServerRequest('GET', '/'));
@@ -45,7 +45,7 @@ class FullApplicationTest extends TestCase
         $app = new Application;
 
         $app->router->get('/', function () {
-            return new Response('Hello World');
+            return 'Hello World';
         });
 
         $response = $app->handle((new ServerRequestFactory)->createServerRequest('GET', '/'));
@@ -57,11 +57,11 @@ class FullApplicationTest extends TestCase
         $app = new Application;
 
         $app->router->get('/', function () {
-            return new TextResponse('Hello World');
+            return 'Hello World';
         });
 
         $app->router->post('/', function () {
-            return new TextResponse('Hello World');
+            return 'Hello World';
         });
 
         $response = $app->handle((new ServerRequestFactory)->createServerRequest('GET', '/'));
@@ -112,7 +112,7 @@ class FullApplicationTest extends TestCase
         $app->middleware(MiniTestMiddleware::class);
 
         $app->router->get('/', function () {
-            return new Response('Hello World');
+            return 'Hello World';
         });
 
         $response = $app->handle((new ServerRequestFactory)->createServerRequest('GET', '/'));
@@ -128,19 +128,19 @@ class FullApplicationTest extends TestCase
         $app->routeMiddleware(['foo' => 'MiniTestMiddleware', 'passing' => 'MiniTestPlainMiddleware']);
 
         $app->router->get('/', function () {
-            return new TextResponse('Hello World');
+            return 'Hello World';
         });
 
         $app->router->get('/foo', ['middleware' => 'foo', function () {
-            return new TextResponse('Hello World');
+            return 'Hello World';
         }]);
 
         $app->router->get('/bar', ['middleware' => ['foo'], function () {
-            return new TextResponse('Hello World');
+            return 'Hello World';
         }]);
 
         $app->router->get('/fooBar', ['middleware' => 'passing|foo', function () {
-            return new TextResponse('Hello World');
+            return 'Hello World';
         }]);
 
         $response = $app->handle((new ServerRequestFactory)->createServerRequest('GET', '/'));
@@ -167,7 +167,7 @@ class FullApplicationTest extends TestCase
         $app->middleware(['MiniTestParameterizedMiddleware:foo,bar']);
 
         $app->router->get('/', function () {
-            return new TextResponse('Hello World');
+            return 'Hello World';
         });
 
         $response = $app->handle((new ServerRequestFactory)->createServerRequest('GET', '/'));
@@ -183,7 +183,7 @@ class FullApplicationTest extends TestCase
         $app->routeMiddleware(['foo' => 'MiniTestParameterizedMiddleware', 'passing' => 'MiniTestPlainMiddleware']);
 
         $app->router->get('/', ['middleware' => 'passing|foo:bar,boom', function () {
-            return new TextResponse('Hello World');
+            return 'Hello World';
         }]);
 
         $response = $app->handle((new ServerRequestFactory)->createServerRequest('GET', '/'));
@@ -200,7 +200,7 @@ class FullApplicationTest extends TestCase
         $app->instance('middleware.disable', true);
 
         $app->router->get('/', function () {
-            return new TextResponse('Hello World');
+            return 'Hello World';
         });
 
         $response = $app->handle((new ServerRequestFactory)->createServerRequest('GET', '/'));
@@ -216,7 +216,7 @@ class FullApplicationTest extends TestCase
     //     $app->middleware(['MiniTestTerminateMiddleware']);
 
     //     $app->router->get('/', function () {
-    //         return new TextResponse('Hello World');
+    //         return 'Hello World';
     //     });
 
     //     $response = $app->handle((new ServerRequestFactory)->createServerRequest('GET', '/'));
@@ -249,7 +249,7 @@ class FullApplicationTest extends TestCase
         $mock->shouldIgnoreMissing();
 
         $app->router->get('/', function () {
-            return new TextResponse('Hello World');
+            return 'Hello World';
         });
 
         $response = $app->handle((new ServerRequestFactory)->createServerRequest('GET', '/foo'));
@@ -264,7 +264,7 @@ class FullApplicationTest extends TestCase
         $mock->shouldIgnoreMissing();
 
         $app->router->post('/', function () {
-            return new TextResponse('Hello World');
+            return 'Hello World';
         });
 
         $response = $app->handle((new ServerRequestFactory)->createServerRequest('GET', '/'));
@@ -423,7 +423,7 @@ class FullApplicationTest extends TestCase
         $routes = new FastRoute\RouteCollector(new FastRoute\RouteParser\Std, new FastRoute\DataGenerator\GroupCountBased);
 
         $routes->addRoute('GET', '/', [function () {
-            return new TextResponse('Hello World');
+            return 'Hello World';
         }]);
 
         $app = new Application;
