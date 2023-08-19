@@ -1,21 +1,21 @@
 <?php
 
-use Mockery as m;
 use Illuminate\Console\Command;
-use Laminas\Diactoros\Response;
-use Mini\Framework\Application;
-use PHPUnit\Framework\TestCase;
-use Laminas\Diactoros\StreamFactory;
-use Mini\Framework\Http\ServerRequest;
-use Mini\Framework\Validation\Factory;
-use Illuminate\View\ViewServiceProvider;
-use Laminas\Diactoros\Response\TextResponse;
-use Psr\Http\Message\ServerRequestInterface;
-use Mini\Framework\Http\ServerRequestFactory;
-use Symfony\Component\Console\Input\ArrayInput;
 use Illuminate\Contracts\Debug\ExceptionHandler;
-use Symfony\Component\Console\Output\NullOutput;
+use Illuminate\View\ViewServiceProvider;
+use Laminas\Diactoros\Response;
+use Laminas\Diactoros\Response\TextResponse;
+use Laminas\Diactoros\StreamFactory;
+use Mini\Framework\Application;
 use Mini\Framework\Console\ConsoleServiceProvider;
+use Mini\Framework\Http\ServerRequest;
+use Mini\Framework\Http\ServerRequestFactory;
+use Mini\Framework\Validation\Factory;
+use Mockery as m;
+use PHPUnit\Framework\TestCase;
+use Psr\Http\Message\ServerRequestInterface;
+use Symfony\Component\Console\Input\ArrayInput;
+use Symfony\Component\Console\Output\NullOutput;
 
 class FullApplicationTest extends TestCase
 {
