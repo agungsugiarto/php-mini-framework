@@ -1,13 +1,21 @@
 <?php
 
-use Laminas\Diactoros\Response;
-use Laminas\Diactoros\Response\TextResponse;
-use Laminas\Diactoros\StreamFactory;
-use Mini\Framework\Application;
-use Mini\Framework\Http\ServerRequestFactory;
 use Mockery as m;
+use Illuminate\Console\Command;
+use Laminas\Diactoros\Response;
+use Mini\Framework\Application;
 use PHPUnit\Framework\TestCase;
+use Laminas\Diactoros\StreamFactory;
+use Mini\Framework\Http\ServerRequest;
+use Mini\Framework\Validation\Factory;
+use Illuminate\View\ViewServiceProvider;
+use Laminas\Diactoros\Response\TextResponse;
 use Psr\Http\Message\ServerRequestInterface;
+use Mini\Framework\Http\ServerRequestFactory;
+use Symfony\Component\Console\Input\ArrayInput;
+use Illuminate\Contracts\Debug\ExceptionHandler;
+use Symfony\Component\Console\Output\NullOutput;
+use Mini\Framework\Console\ConsoleServiceProvider;
 
 class FullApplicationTest extends TestCase
 {
@@ -292,313 +300,317 @@ class FullApplicationTest extends TestCase
         $this->assertInstanceOf(Response::class, $response);
     }
 
-    // public function testGeneratingUrls()
-    // {
-    //     $app = new Application;
-    //     $app->instance('request', (new ServerRequestFactory)->createServerRequest('GET', '/'));
-
-    //     $app->router->get('/foo-bar', ['as' => 'foo', function () {
-    //         //
-    //     }]);
-
-    //     $app->router->get('/foo-bar/{baz}/{boom}', ['as' => 'bar', function () {
-    //         //
-    //     }]);
-
-    //     $app->router->get('/foo-bar/{baz}[/{boom}]', ['as' => 'optional', function () {
-    //         //
-    //     }]);
-
-    //     $app->router->get('/foo-bar/{baz:[0-9]+}[/{boom}]', ['as' => 'regex', function () {
-    //         //
-    //     }]);
-
-    //     $this->assertEquals('SERVER_NAME/something', url('something'));
-    //     $this->assertEquals('http://lumen.laravel.com/foo-bar', route('foo'));
-    //     $this->assertEquals('http://lumen.laravel.com/foo-bar/1/2', route('bar', ['baz' => 1, 'boom' => 2]));
-    //     $this->assertEquals('http://lumen.laravel.com/foo-bar?baz=1&boom=2', route('foo', ['baz' => 1, 'boom' => 2]));
-    //     $this->assertEquals('http://lumen.laravel.com/foo-bar/1/2', route('optional', ['baz' => 1, 'boom' => 2]));
-    //     $this->assertEquals('http://lumen.laravel.com/foo-bar/1', route('optional', ['baz' => 1]));
-    //     $this->assertEquals('http://lumen.laravel.com/foo-bar/1/2', route('regex', ['baz' => 1, 'boom' => 2]));
-    //     $this->assertEquals('http://lumen.laravel.com/foo-bar/1', route('regex', ['baz' => 1]));
-    // }
-
-    // public function testGeneratingUrlsForRegexParameters()
-    // {
-    //     $app = new Application;
-    //     $app->instance('request', Request::create('http://lumen.laravel.com', 'GET'));
-
-    //     $app->router->get('/foo-bar', ['as' => 'foo', function () {
-    //         //
-    //     }]);
-
-    //     $app->router->get('/foo-bar/{baz:[0-9]+}/{boom}', ['as' => 'bar', function () {
-    //         //
-    //     }]);
-
-    //     $app->router->get('/foo-bar/{baz:[0-9]+}/{boom:[0-9]+}', ['as' => 'baz', function () {
-    //         //
-    //     }]);
-
-    //     $app->router->get('/foo-bar/{baz:[0-9]{2,5}}', ['as' => 'boom', function () {
-    //         //
-    //     }]);
-
-    //     $this->assertEquals('http://lumen.laravel.com/something', url('something'));
-    //     $this->assertEquals('http://lumen.laravel.com/foo-bar', route('foo'));
-    //     $this->assertEquals('http://lumen.laravel.com/foo-bar/1/2', route('bar', ['baz' => 1, 'boom' => 2]));
-    //     $this->assertEquals('http://lumen.laravel.com/foo-bar/1/2', route('baz', ['baz' => 1, 'boom' => 2]));
-    //     $this->assertEquals('http://lumen.laravel.com/foo-bar/{baz:[0-9]+}/{boom:[0-9]+}?ba=1&bo=2', route('baz', ['ba' => 1, 'bo' => 2]));
-    //     $this->assertEquals('http://lumen.laravel.com/foo-bar/5', route('boom', ['baz' => 5]));
-    // }
-
-    // public function testRegisterServiceProvider()
-    // {
-    //     $app = new Application;
-    //     $provider = new LumenTestServiceProvider($app);
-    //     $app->register($provider);
-
-    //     $this->assertTrue(true);
-    // }
-
-    // public function testApplicationBootsServiceProvidersOnBoot()
-    // {
-    //     $app = new Application();
-
-    //     $provider = new LumenBootableTestServiceProvider($app);
-    //     $app->register($provider);
-
-    //     $this->assertFalse($provider->booted);
-    //     $app->boot();
-    //     $this->assertTrue($provider->booted);
-    // }
-
-    // public function testRegisterServiceProviderAfterBoot()
-    // {
-    //     $app = new Application();
-    //     $provider = new LumenBootableTestServiceProvider($app);
-    //     $app->boot();
-    //     $app->register($provider);
-    //     $this->assertTrue($provider->booted);
-    // }
-
-    // public function testApplicationBootsOnlyOnce()
-    // {
-    //     $app = new Application();
-    //     $provider = new class($app) extends \Illuminate\Support\ServiceProvider
-    //     {
-    //         public $bootCount = 0;
-
-    //         public function boot()
-    //         {
-    //             $this->bootCount += 1;
-    //         }
-    //     };
+    public function testGeneratingUrls()
+    {
+        $app = new Application;
+        $app->instance('request', (new ServerRequestFactory)->createServerRequest('GET', 'http://lumen.laravel.com'));
+
+        $app->router->get('/foo-bar', ['as' => 'foo', function () {
+            //
+        }]);
+
+        $app->router->get('/foo-bar/{baz}/{boom}', ['as' => 'bar', function () {
+            //
+        }]);
+
+        $app->router->get('/foo-bar/{baz}[/{boom}]', ['as' => 'optional', function () {
+            //
+        }]);
+
+        $app->router->get('/foo-bar/{baz:[0-9]+}[/{boom}]', ['as' => 'regex', function () {
+            //
+        }]);
+
+        $this->assertEquals('http://lumen.laravel.com/something', url('something'));
+        $this->assertEquals('http://lumen.laravel.com/foo-bar', route('foo'));
+        $this->assertEquals('http://lumen.laravel.com/foo-bar/1/2', route('bar', ['baz' => 1, 'boom' => 2]));
+        $this->assertEquals('http://lumen.laravel.com/foo-bar?baz=1&boom=2', route('foo', ['baz' => 1, 'boom' => 2]));
+        $this->assertEquals('http://lumen.laravel.com/foo-bar/1/2', route('optional', ['baz' => 1, 'boom' => 2]));
+        $this->assertEquals('http://lumen.laravel.com/foo-bar/1', route('optional', ['baz' => 1]));
+        $this->assertEquals('http://lumen.laravel.com/foo-bar/1/2', route('regex', ['baz' => 1, 'boom' => 2]));
+        $this->assertEquals('http://lumen.laravel.com/foo-bar/1', route('regex', ['baz' => 1]));
+    }
+
+    public function testGeneratingUrlsForRegexParameters()
+    {
+        $app = new Application;
+        $app->instance('request', (new ServerRequestFactory)->createServerRequest('GET', 'http://lumen.laravel.com'));
+
+        $app->router->get('/foo-bar', ['as' => 'foo', function () {
+            //
+        }]);
+
+        $app->router->get('/foo-bar/{baz:[0-9]+}/{boom}', ['as' => 'bar', function () {
+            //
+        }]);
+
+        $app->router->get('/foo-bar/{baz:[0-9]+}/{boom:[0-9]+}', ['as' => 'baz', function () {
+            //
+        }]);
+
+        $app->router->get('/foo-bar/{baz:[0-9]{2,5}}', ['as' => 'boom', function () {
+            //
+        }]);
+
+        $this->assertEquals('http://lumen.laravel.com/something', url('something'));
+        $this->assertEquals('http://lumen.laravel.com/foo-bar', route('foo'));
+        $this->assertEquals('http://lumen.laravel.com/foo-bar/1/2', route('bar', ['baz' => 1, 'boom' => 2]));
+        $this->assertEquals('http://lumen.laravel.com/foo-bar/1/2', route('baz', ['baz' => 1, 'boom' => 2]));
+        $this->assertEquals('http://lumen.laravel.com/foo-bar/{baz:[0-9]+}/{boom:[0-9]+}?ba=1&bo=2', route('baz', ['ba' => 1, 'bo' => 2]));
+        $this->assertEquals('http://lumen.laravel.com/foo-bar/5', route('boom', ['baz' => 5]));
+    }
+
+    public function testRegisterServiceProvider()
+    {
+        $app = new Application;
+        $provider = new LumenTestServiceProvider($app);
+        $app->register($provider);
+
+        $this->assertTrue(true);
+    }
+
+    public function testApplicationBootsServiceProvidersOnBoot()
+    {
+        $app = new Application();
+
+        $provider = new LumenBootableTestServiceProvider($app);
+        $app->register($provider);
+
+        $this->assertFalse($provider->booted);
+        $app->boot();
+        $this->assertTrue($provider->booted);
+    }
+
+    public function testRegisterServiceProviderAfterBoot()
+    {
+        $app = new Application();
+        $provider = new LumenBootableTestServiceProvider($app);
+        $app->boot();
+        $app->register($provider);
+        $this->assertTrue($provider->booted);
+    }
+
+    public function testApplicationBootsOnlyOnce()
+    {
+        $app = new Application();
+        $provider = new class($app) extends \Illuminate\Support\ServiceProvider
+        {
+            public $bootCount = 0;
+
+            public function boot()
+            {
+                $this->bootCount += 1;
+            }
+        };
 
-    //     $app->register($provider);
-    //     $app->boot();
-    //     $app->boot();
-    //     $this->assertEquals(1, $provider->bootCount);
-    // }
+        $app->register($provider);
+        $app->boot();
+        $app->boot();
+        $this->assertEquals(1, $provider->bootCount);
+    }
 
-    // public function testApplicationBootsWhenRequestIsDispatched()
-    // {
-    //     $app = new Application();
-    //     $provider = new LumenBootableTestServiceProvider($app);
-    //     $app->register($provider);
-    //     $resp = $app->dispatch();
-    //     $this->assertTrue($provider->booted);
-    // }
+    public function testApplicationBootsWhenRequestIsDispatched()
+    {
+        $app = new Application();
+        $provider = new LumenBootableTestServiceProvider($app);
+        $app->register($provider);
+        $resp = $app->handle((new ServerRequestFactory)->createServerRequest('GET', '/'));
+        $this->assertTrue($provider->booted);
+    }
 
-    // public function testUsingCustomDispatcher()
-    // {
-    //     $routes = new FastRoute\RouteCollector(new FastRoute\RouteParser\Std, new FastRoute\DataGenerator\GroupCountBased);
+    public function testUsingCustomDispatcher()
+    {
+        $routes = new FastRoute\RouteCollector(new FastRoute\RouteParser\Std, new FastRoute\DataGenerator\GroupCountBased);
 
-    //     $routes->addRoute('GET', '/', [function () {
-    //         return response('Hello World');
-    //     }]);
+        $routes->addRoute('GET', '/', [function () {
+            return new TextResponse('Hello World');
+        }]);
 
-    //     $app = new Application;
+        $app = new Application;
 
-    //     $app->setDispatcher(new FastRoute\Dispatcher\GroupCountBased($routes->getData()));
+        $app->setDispatcher(new FastRoute\Dispatcher\GroupCountBased($routes->getData()));
 
-    //     $response = $app->handle(Request::create('/', 'GET'));
+        $response = $app->handle((new ServerRequestFactory)->createServerRequest('GET', '/'));
 
-    //     $this->assertEquals(200, $response->getStatusCode());
-    //     $this->assertEquals('Hello World', $response->getContent());
-    // }
+        $this->assertEquals(200, $response->getStatusCode());
+        $this->assertEquals('Hello World', $response->getBody()->getContents());
+    }
 
-    // public function testMiddlewareReceiveResponsesEvenWhenStringReturned()
-    // {
-    //     unset($_SERVER['__middleware.response']);
+    public function testMiddlewareReceiveResponsesEvenWhenStringReturned()
+    {
+        unset($_SERVER['__middleware.response']);
 
-    //     $app = new Application;
+        $app = new Application;
 
-    //     $app->routeMiddleware(['foo' => 'LumenTestPlainMiddleware']);
+        $app->routeMiddleware(['foo' => 'MiniTestPlainMiddleware']);
 
-    //     $app->router->get('/', ['middleware' => 'foo', function () {
-    //         return 'Hello World';
-    //     }]);
+        $app->router->get('/', ['middleware' => 'foo', function () {
+            return 'Hello World';
+        }]);
 
-    //     $response = $app->handle(Request::create('/', 'GET'));
-    //     $this->assertEquals(200, $response->getStatusCode());
-    //     $this->assertEquals('Hello World', $response->getContent());
-    //     $this->assertTrue($_SERVER['__middleware.response']);
-    // }
+        $response = $app->handle((new ServerRequestFactory)->createServerRequest('GET', '/'));
+        $this->assertEquals(200, $response->getStatusCode());
+        $this->assertEquals('Hello World', $response->getBody()->getContents());
+        $this->assertTrue($_SERVER['__middleware.response']);
+    }
 
-    // public function testBasicControllerDispatching()
-    // {
-    //     $app = new Application;
+    public function testBasicControllerDispatching()
+    {
+        $app = new Application;
 
-    //     $app->router->get('/show/{id}', 'LumenTestController@show');
+        $app->router->get('/show/{id}', 'LumenTestController@show');
 
-    //     $response = $app->handle(Request::create('/show/25', 'GET'));
+        $response = $app->handle((new ServerRequestFactory)->createServerRequest('GET', 'show/25'));
 
-    //     $this->assertEquals(200, $response->getStatusCode());
-    //     $this->assertEquals('25', $response->getContent());
-    // }
+        $this->assertEquals(200, $response->getStatusCode());
+        $this->assertEquals('25', $response->getBody()->getContents());
+    }
 
-    // public function testBasicControllerDispatchingWithGroup()
-    // {
-    //     $app = new Application;
-    //     $app->routeMiddleware(['test' => MiniTestMiddleware::class]);
+    public function testBasicControllerDispatchingWithGroup()
+    {
+        $app = new Application;
+        $app->routeMiddleware(['test' => MiniTestMiddleware::class]);
 
-    //     $app->router->group(['middleware' => 'test'], function ($router) {
-    //         $router->get('/show/{id}', 'LumenTestController@show');
-    //     });
+        $app->router->group(['middleware' => 'test'], function ($router) {
+            $router->get('/show/{id}', 'LumenTestController@show');
+        });
 
-    //     $response = $app->handle(Request::create('/show/25', 'GET'));
+        $response = $app->handle((new ServerRequestFactory)->createServerRequest('GET', 'show/25'));
 
-    //     $this->assertEquals(200, $response->getStatusCode());
-    //     $this->assertEquals('Middleware', $response->getContent());
-    // }
+        $this->assertEquals(200, $response->getStatusCode());
+        $this->assertEquals('Middleware', $response->getBody()->getContents());
+    }
 
-    // public function testBasicControllerDispatchingWithGroupSuffix()
-    // {
-    //     $app = new Application;
-    //     $app->routeMiddleware(['test' => MiniTestMiddleware::class]);
+    public function testBasicControllerDispatchingWithGroupSuffix()
+    {
+        $app = new Application;
+        $app->routeMiddleware(['test' => MiniTestMiddleware::class]);
 
-    //     $app->router->group(['suffix' => '.{format:json|xml}'], function ($router) {
-    //         $router->get('/show/{id}', 'LumenTestController@show');
-    //     });
+        $app->router->group(['suffix' => '.{format:json|xml}'], function ($router) {
+            $router->get('/show/{id}', 'LumenTestController@show');
+        });
 
-    //     $response = $app->handle(Request::create('/show/25.xml', 'GET'));
+        $response = $app->handle((new ServerRequestFactory)->createServerRequest('GET', 'show/25.xml'));
 
-    //     $this->assertEquals(200, $response->getStatusCode());
-    //     $this->assertEquals('25', $response->getContent());
-    // }
+        $this->assertEquals(200, $response->getStatusCode());
+        $this->assertEquals('25', $response->getBody()->getContents());
+    }
 
-    // public function testBasicControllerDispatchingWithGroupAndSuffixWithPath()
-    // {
-    //     $app = new Application;
-    //     $app->routeMiddleware(['test' => MiniTestMiddleware::class]);
+    public function testBasicControllerDispatchingWithGroupAndSuffixWithPath()
+    {
+        $app = new Application;
+        $app->routeMiddleware(['test' => MiniTestMiddleware::class]);
 
-    //     $app->router->group(['suffix' => '/{format:json|xml}'], function ($router) {
-    //         $router->get('/show/{id}', 'LumenTestController@show');
-    //     });
+        $app->router->group(['suffix' => '/{format:json|xml}'], function ($router) {
+            $router->get('/show/{id}', 'LumenTestController@show');
+        });
 
-    //     $response = $app->handle(Request::create('/show/test/json', 'GET'));
+        $response = $app->handle((new ServerRequestFactory)->createServerRequest('GET', 'show/test/json'));
 
-    //     $this->assertEquals(200, $response->getStatusCode());
-    //     $this->assertEquals('test', $response->getContent());
-    // }
+        $this->assertEquals(200, $response->getStatusCode());
+        $this->assertEquals('test', $response->getBody()->getContents());
+    }
 
-    // public function testBasicControllerDispatchingWithMiddlewareIntercept()
-    // {
-    //     $app = new Application;
-    //     $app->routeMiddleware(['test' => MiniTestMiddleware::class]);
-    //     $app->router->get('/show/{id}', 'LumenTestControllerWithMiddleware@show');
+    public function testBasicControllerDispatchingWithMiddlewareIntercept()
+    {
+        $app = new Application;
+        $app->routeMiddleware(['test' => MiniTestMiddleware::class]);
+        $app->router->get('/show/{id}', 'LumenTestControllerWithMiddleware@show');
 
-    //     $response = $app->handle(Request::create('/show/25', 'GET'));
+        $response = $app->handle((new ServerRequestFactory)->createServerRequest('GET', 'show/25'));
 
-    //     $this->assertEquals(200, $response->getStatusCode());
-    //     $this->assertEquals('Middleware', $response->getContent());
-    // }
+        $this->assertEquals(200, $response->getStatusCode());
+        $this->assertEquals('Middleware', $response->getBody()->getContents());
+    }
 
-    // public function testBasicInvokableActionDispatching()
-    // {
-    //     $app = new Application;
+    public function testBasicInvokableActionDispatching()
+    {
+        $app = new Application;
 
-    //     $app->router->get('/action/{id}', 'LumenTestAction');
+        $app->router->get('/action/{id}', 'LumenTestAction');
 
-    //     $response = $app->handle(Request::create('/action/199', 'GET'));
+        $response = $app->handle((new ServerRequestFactory)->createServerRequest('GET', 'action/199'));
 
-    //     $this->assertEquals(200, $response->getStatusCode());
-    //     $this->assertEquals('199', $response->getContent());
-    // }
+        $this->assertEquals(200, $response->getStatusCode());
+        $this->assertEquals('199', $response->getBody()->getContents());
+    }
 
-    // public function testEnvironmentDetection()
-    // {
-    //     $app = new Application;
+    public function testEnvironmentDetection()
+    {
+        $app = new Application;
 
-    //     $this->assertEquals('production', $app->environment());
-    //     $this->assertTrue($app->environment('production'));
-    //     $this->assertTrue($app->environment(['production']));
-    // }
+        $this->assertEquals('production', $app->environment());
+        $this->assertTrue($app->environment('production'));
+        $this->assertTrue($app->environment(['production']));
+    }
 
-    // public function testNamespaceDetection()
-    // {
-    //     $app = new Application;
-    //     $this->expectException('RuntimeException');
-    //     $app->getNamespace();
-    // }
+    public function testNamespaceDetection()
+    {
+        $app = new Application;
+        $this->expectException('RuntimeException');
+        $app->getNamespace();
+    }
 
-    // public function testRunningUnitTestsDetection()
-    // {
-    //     $app = new Application;
+    public function testRunningUnitTestsDetection()
+    {
+        $app = new Application;
 
-    //     $this->assertFalse($app->runningUnitTests());
-    // }
+        $this->assertFalse($app->runningUnitTests());
+    }
 
-    // public function testValidationHelpers()
-    // {
-    //     $app = new Application;
+    public function testValidationHelpers()
+    {
+        $app = new Application;
 
-    //     $app->router->get('/', function (Illuminate\Http\Request $request) {
-    //         $data = $this->validate($request, ['name' => 'required']);
+        $app->router->get('/', function (ServerRequest $request) {
+            $data = $this->validate($request, ['name' => 'required']);
 
-    //         return $data;
-    //     });
+            return $data;
+        });
 
-    //     $response = $app->handle(Request::create('/', 'GET'));
+        $response = $app->handle((new ServerRequestFactory)->createServerRequest('GET', '/'));
 
-    //     $this->assertEquals(422, $response->getStatusCode());
+        $this->assertEquals(422, $response->getStatusCode());
 
-    //     $response = $app->handle(Request::create('/', 'GET', ['name' => 'Jon']));
+        $response = $app->handle(
+            (new ServerRequestFactory)->createServerRequest('GET', '/')
+                ->withHeader('Content-Type', 'application/json')
+                ->withBody((new StreamFactory)->createStream('{"name":"Jon"}'))
+        );
 
-    //     $this->assertEquals(200, $response->getStatusCode());
-    //     $this->assertEquals($response->getContent(), '{"name":"Jon"}');
-    // }
+        $this->assertEquals(200, $response->getStatusCode());
+        $this->assertEquals($response->getBody()->getContents(), '{"name":"Jon"}');
+    }
 
-    // public function testRedirectResponse()
-    // {
-    //     $app = new Application;
+    public function testRedirectResponse()
+    {
+        $app = new Application;
 
-    //     $app->router->get('/', function (Illuminate\Http\Request $request) {
-    //         return redirect('home');
-    //     });
+        $app->router->get('/', function (ServerRequest $request) {
+            return redirect('home');
+        });
 
-    //     $response = $app->handle(Request::create('/', 'GET'));
+        $response = $app->handle((new ServerRequestFactory)->createServerRequest('GET', '/'));
 
-    //     $this->assertEquals(302, $response->getStatusCode());
-    // }
+        $this->assertEquals(302, $response->getStatusCode());
+    }
 
-    // public function testRedirectToNamedRoute()
-    // {
-    //     $app = new Application;
+    public function testRedirectToNamedRoute()
+    {
+        $app = new Application;
 
-    //     $app->router->get('login', ['as' => 'login', function (Illuminate\Http\Request $request) {
-    //         return 'login';
-    //     }]);
+        $app->router->get('login', ['as' => 'login', function (ServerRequest $request) {
+            return 'login';
+        }]);
 
-    //     $app->router->get('/', function (Illuminate\Http\Request $request) {
-    //         return redirect()->route('login');
-    //     });
+        $app->router->get('/', function (ServerRequest $request) {
+            return redirect()->route('login');
+        });
 
-    //     $response = $app->handle(Request::create('/', 'GET'));
+        $response = $app->handle((new ServerRequestFactory)->createServerRequest('GET', '/'));
 
-    //     $this->assertEquals(302, $response->getStatusCode());
-    // }
+        $this->assertEquals(302, $response->getStatusCode());
+    }
 
     // public function testRequestUser()
     // {
@@ -617,260 +629,260 @@ class FullApplicationTest extends TestCase
     //     $this->assertSame('1234', $response->getContent());
     // }
 
-    // public function testCanResolveFilesystemFactoryFromContract()
-    // {
-    //     $app = new Application();
+    public function testCanResolveFilesystemFactoryFromContract()
+    {
+        $app = new Application();
 
-    //     $filesystem = $app[Illuminate\Contracts\Filesystem\Factory::class];
+        $filesystem = $app[Illuminate\Contracts\Filesystem\Factory::class];
 
-    //     $this->assertInstanceOf(Illuminate\Contracts\Filesystem\Factory::class, $filesystem);
-    // }
+        $this->assertInstanceOf(Illuminate\Contracts\Filesystem\Factory::class, $filesystem);
+    }
 
-    // public function testCanResolveValidationFactoryFromContract()
-    // {
-    //     $app = new Application();
+    public function testCanResolveValidationFactoryFromContract()
+    {
+        $app = new Application();
 
-    //     $validator = $app[Factory::class];
+        $validator = $app[Factory::class];
 
-    //     $this->assertInstanceOf(Factory::class, $validator);
-    // }
+        $this->assertInstanceOf(Factory::class, $validator);
+    }
 
-    // public function testCanMergeUserProvidedFacadesWithDefaultOnes()
-    // {
-    //     $app = new Application();
+    public function testCanMergeUserProvidedFacadesWithDefaultOnes()
+    {
+        $app = new Application();
 
-    //     $aliases = [
-    //         UserFacade::class => 'Foo',
-    //     ];
+        $aliases = [
+            UserFacade::class => 'Foo',
+        ];
 
-    //     $app->withFacades(true, $aliases);
+        $app->withFacades(true, $aliases);
 
-    //     $this->assertTrue(class_exists('Foo'));
-    // }
+        $this->assertTrue(class_exists('Foo'));
+    }
 
-    // public function testNestedGroupMiddlewaresRequest()
-    // {
-    //     $app = new Application();
+    public function testNestedGroupMiddlewaresRequest()
+    {
+        $app = new Application();
 
-    //     $app->router->group(['middleware' => 'middleware1'], function ($router) {
-    //         $router->group(['middleware' => 'middleware2|middleware3'], function ($router) {
-    //             $router->get('test', 'LumenTestController@show');
-    //         });
-    //     });
+        $app->router->group(['middleware' => 'middleware1'], function ($router) {
+            $router->group(['middleware' => 'middleware2|middleware3'], function ($router) {
+                $router->get('test', 'LumenTestController@show');
+            });
+        });
 
-    //     $route = $app->router->getRoutes()['GET/test'];
+        $route = $app->router->getRoutes()['GET/test'];
 
-    //     $this->assertEquals([
-    //         'middleware1',
-    //         'middleware2',
-    //         'middleware3',
-    //     ], $route['action']['middleware']);
-    // }
+        $this->assertEquals([
+            'middleware1',
+            'middleware2',
+            'middleware3',
+        ], $route['action']['middleware']);
+    }
 
-    // public function testNestedGroupNamespaceRequest()
-    // {
-    //     $app = new Application();
+    public function testNestedGroupNamespaceRequest()
+    {
+        $app = new Application();
 
-    //     $app->router->group(['namespace' => 'Hello'], function ($router) {
-    //         $router->group(['namespace' => 'World'], function ($router) {
-    //             $router->get('/world', 'Class@method');
-    //         });
-    //     });
+        $app->router->group(['namespace' => 'Hello'], function ($router) {
+            $router->group(['namespace' => 'World'], function ($router) {
+                $router->get('/world', 'Class@method');
+            });
+        });
 
-    //     $routes = $app->router->getRoutes();
+        $routes = $app->router->getRoutes();
 
-    //     $route = $routes['GET/world'];
+        $route = $routes['GET/world'];
 
-    //     $this->assertEquals('Hello\\World\\Class@method', $route['action']['uses']);
-    // }
+        $this->assertEquals('Hello\\World\\Class@method', $route['action']['uses']);
+    }
 
-    // public function testNestedGroupNamespaceWithFQCNClassName()
-    // {
-    //     $app = new Application();
+    public function testNestedGroupNamespaceWithFQCNClassName()
+    {
+        $app = new Application();
 
-    //     $app->router->group(['namespace' => 'Hello'], function ($router) {
-    //         $router->group(['namespace' => 'World'], function ($router) {
-    //             $router->get('/world', '\Global\Namespaced\Class@method');
-    //         });
-    //     });
+        $app->router->group(['namespace' => 'Hello'], function ($router) {
+            $router->group(['namespace' => 'World'], function ($router) {
+                $router->get('/world', '\Global\Namespaced\Class@method');
+            });
+        });
 
-    //     $routes = $app->router->getRoutes();
+        $routes = $app->router->getRoutes();
 
-    //     $route = $routes['GET/world'];
+        $route = $routes['GET/world'];
 
-    //     $this->assertEquals('\\Global\\Namespaced\\Class@method', $route['action']['uses']);
-    // }
+        $this->assertEquals('\\Global\\Namespaced\\Class@method', $route['action']['uses']);
+    }
 
-    // public function testNestedGroupPrefixRequest()
-    // {
-    //     $app = new Application();
+    public function testNestedGroupPrefixRequest()
+    {
+        $app = new Application();
 
-    //     $app->router->group(['prefix' => 'hello'], function ($router) {
-    //         $router->group(['prefix' => 'world'], function ($router) {
-    //             $router->get('/world', 'Class@method');
-    //         });
-    //     });
+        $app->router->group(['prefix' => 'hello'], function ($router) {
+            $router->group(['prefix' => 'world'], function ($router) {
+                $router->get('/world', 'Class@method');
+            });
+        });
 
-    //     $routes = $app->router->getRoutes();
+        $routes = $app->router->getRoutes();
 
-    //     $this->assertArrayHasKey('GET/hello/world/world', $routes);
-    // }
+        $this->assertArrayHasKey('GET/hello/world/world', $routes);
+    }
 
-    // public function testNestedGroupAsRequest()
-    // {
-    //     $app = new Application();
+    public function testNestedGroupAsRequest()
+    {
+        $app = new Application();
 
-    //     $app->router->group(['as' => 'hello'], function ($router) {
-    //         $router->group(['as' => 'world'], function ($router) {
-    //             $router->get('/world', 'Class@method');
-    //         });
-    //     });
+        $app->router->group(['as' => 'hello'], function ($router) {
+            $router->group(['as' => 'world'], function ($router) {
+                $router->get('/world', 'Class@method');
+            });
+        });
 
-    //     $this->assertArrayHasKey('hello.world', $app->router->namedRoutes);
-    //     $this->assertEquals('/world', $app->router->namedRoutes['hello.world']);
-    // }
+        $this->assertArrayHasKey('hello.world', $app->router->namedRoutes);
+        $this->assertEquals('/world', $app->router->namedRoutes['hello.world']);
+    }
 
-    // public function testContainerBindingsAreNotOverwritten()
-    // {
-    //     $app = new Application();
+    public function testContainerBindingsAreNotOverwritten()
+    {
+        $app = new Application();
 
-    //     $mock = m::mock(Illuminate\Bus\Dispatcher::class);
+        $mock = m::mock(Illuminate\Bus\Dispatcher::class);
 
-    //     $app->instance(Illuminate\Contracts\Bus\Dispatcher::class, $mock);
+        $app->instance(Illuminate\Contracts\Bus\Dispatcher::class, $mock);
 
-    //     $this->assertSame(
-    //         $mock,
-    //         $app->make(Illuminate\Contracts\Bus\Dispatcher::class)
-    //     );
-    // }
+        $this->assertSame(
+            $mock,
+            $app->make(Illuminate\Contracts\Bus\Dispatcher::class)
+        );
+    }
 
-    // public function testApplicationClassCanBeOverwritten()
-    // {
-    //     $app = new LumenTestApplication();
+    public function testApplicationClassCanBeOverwritten()
+    {
+        $app = new LumenTestApplication();
 
-    //     $this->assertInstanceOf(LumenTestApplication::class, $app->make(Application::class));
-    // }
+        $this->assertInstanceOf(LumenTestApplication::class, $app->make(Application::class));
+    }
 
-    // public function testRequestIsReboundOnDispatch()
-    // {
-    //     $app = new Application();
-    //     $rebound = false;
-    //     $app->rebinding('request', function () use (&$rebound) {
-    //         $rebound = true;
-    //     });
-    //     $app->handle(Request::create('/'));
-    //     $this->assertTrue($rebound);
-    // }
+    public function testRequestIsReboundOnDispatch()
+    {
+        $app = new Application();
+        $rebound = false;
+        $app->rebinding('request', function () use (&$rebound) {
+            $rebound = true;
+        });
+        $app->handle((new ServerRequestFactory)->createServerRequest('GET', '/'));
+        $this->assertTrue($rebound);
+    }
 
-    // public function testBatchesTableCommandIsRegistered()
-    // {
-    //     $app = new LumenTestApplication();
-    //     $app->register(ConsoleServiceProvider::class);
-    //     $command = $app->make('command.queue.batches-table');
-    //     $this->assertNotNull($command);
-    //     $this->assertEquals('queue:batches-table', $command->getName());
-    // }
+    public function testBatchesTableCommandIsRegistered()
+    {
+        $app = new LumenTestApplication();
+        $app->register(ConsoleServiceProvider::class);
+        $command = $app->make('command.queue.batches-table');
+        $this->assertNotNull($command);
+        $this->assertEquals('queue:batches-table', $command->getName());
+    }
 
-    // public function testHandlingCommandsTerminatesApplication()
-    // {
-    //     $app = new LumenTestApplication();
-    //     $app->register(ConsoleServiceProvider::class);
-    //     $app->register(ViewServiceProvider::class);
+    public function testHandlingCommandsTerminatesApplication()
+    {
+        $app = new LumenTestApplication();
+        $app->register(ConsoleServiceProvider::class);
+        $app->register(ViewServiceProvider::class);
 
-    //     $app->instance(ExceptionHandler::class, $mock = m::mock('Mini\Framework\Exceptions\Handler[report]'));
-    //     $mock->shouldIgnoreMissing();
+        $app->instance(ExceptionHandler::class, $mock = m::mock('Mini\Framework\Exceptions\Handler[report]'));
+        $mock->shouldIgnoreMissing();
 
-    //     $kernel = $app[Mini\Framework\Console\Kernel::class];
+        $kernel = $app[Mini\Framework\Console\Kernel::class];
 
-    //     (fn () => $kernel->getArtisan())->call($kernel)->resolveCommands(
-    //         SendEmails::class,
-    //     );
+        (fn () => $kernel->getArtisan())->call($kernel)->resolveCommands(
+            SendEmails::class,
+        );
 
-    //     $terminated = false;
-    //     $app->terminating(function () use (&$terminated) {
-    //         $terminated = true;
-    //     });
+        $terminated = false;
+        $app->terminating(function () use (&$terminated) {
+            $terminated = true;
+        });
 
-    //     $input = new ArrayInput(['command' => 'send:emails']);
+        $input = new ArrayInput(['command' => 'send:emails']);
 
-    //     $command = $kernel->handle($input, new NullOutput());
+        $command = $kernel->handle($input, new NullOutput());
 
-    //     $this->assertTrue($terminated);
-    // }
+        $this->assertTrue($terminated);
+    }
 
-    // public function testTerminationTests()
-    // {
-    //     $app = new LumenTestApplication;
+    public function testTerminationTests()
+    {
+        $app = new LumenTestApplication;
 
-    //     $result = [];
-    //     $callback1 = function () use (&$result) {
-    //         $result[] = 1;
-    //     };
+        $result = [];
+        $callback1 = function () use (&$result) {
+            $result[] = 1;
+        };
 
-    //     $callback2 = function () use (&$result) {
-    //         $result[] = 2;
-    //     };
+        $callback2 = function () use (&$result) {
+            $result[] = 2;
+        };
 
-    //     $callback3 = function () use (&$result) {
-    //         $result[] = 3;
-    //     };
+        $callback3 = function () use (&$result) {
+            $result[] = 3;
+        };
 
-    //     $app->terminating($callback1);
-    //     $app->terminating($callback2);
-    //     $app->terminating($callback3);
+        $app->terminating($callback1);
+        $app->terminating($callback2);
+        $app->terminating($callback3);
 
-    //     $app->terminate();
+        $app->terminate();
 
-    //     $this->assertEquals([1, 2, 3], $result);
-    // }
+        $this->assertEquals([1, 2, 3], $result);
+    }
 }
 
-// class LumenTestService
-// {
-// }
+class LumenTestService
+{
+}
 
-// class LumenTestServiceProvider extends Illuminate\Support\ServiceProvider
-// {
-//     public function register()
-//     {
-//     }
-// }
+class LumenTestServiceProvider extends Illuminate\Support\ServiceProvider
+{
+    public function register()
+    {
+    }
+}
 
-// class LumenBootableTestServiceProvider extends Illuminate\Support\ServiceProvider
-// {
-//     public $booted = false;
+class LumenBootableTestServiceProvider extends Illuminate\Support\ServiceProvider
+{
+    public $booted = false;
 
-//     public function boot()
-//     {
-//         $this->booted = true;
-//     }
-// }
+    public function boot()
+    {
+        $this->booted = true;
+    }
+}
 
-// class LumenTestController
-// {
-//     public function __construct(LumenTestService $service)
-//     {
-//         //
-//     }
+class LumenTestController
+{
+    public function __construct(LumenTestService $service)
+    {
+        //
+    }
 
-//     public function show($id)
-//     {
-//         return $id;
-//     }
-// }
+    public function show($id)
+    {
+        return $id;
+    }
+}
 
-// class LumenTestControllerWithMiddleware extends Mini\Framework\Routing\Controller
-// {
-//     public function __construct(LumenTestService $service)
-//     {
-//         $this->middleware('test');
-//     }
+class LumenTestControllerWithMiddleware extends Mini\Framework\Routing\Controller
+{
+    public function __construct(LumenTestService $service)
+    {
+        $this->middleware('test');
+    }
 
-//     public function show($id)
-//     {
-//         return $id;
-//     }
-// }
+    public function show($id)
+    {
+        return $id;
+    }
+}
 
 class MiniTestMiddleware
 {
@@ -899,25 +911,25 @@ class MiniTestParameterizedMiddleware
     }
 }
 
-// class LumenTestAction
-// {
-//     public function __invoke($id)
-//     {
-//         return $id;
-//     }
-// }
+class LumenTestAction
+{
+    public function __invoke($id)
+    {
+        return $id;
+    }
+}
 
-// class LumenTestApplication extends Application
-// {
-//     public function version()
-//     {
-//         return 'Custom Lumen App';
-//     }
-// }
+class LumenTestApplication extends Application
+{
+    public function version()
+    {
+        return 'Custom Lumen App';
+    }
+}
 
-// class UserFacade
-// {
-// }
+class UserFacade
+{
+}
 
 class MiniTestTerminateMiddleware
 {
@@ -940,12 +952,12 @@ class ResponsableResponse implements \Illuminate\Contracts\Support\Responsable
     }
 }
 
-// class SendEmails extends Command
-// {
-//     protected $signature = 'send:emails';
+class SendEmails extends Command
+{
+    protected $signature = 'send:emails';
 
-//     public function handle()
-//     {
-//         // ..
-//     }
-// }
+    public function handle()
+    {
+        // ..
+    }
+}
